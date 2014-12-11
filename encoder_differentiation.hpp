@@ -1,5 +1,5 @@
-#ifndef ROBOTS_MOTION__ENCODER_INTEGRATION_HPP
-#define ROBOTS_MOTION__ENCODER_INTEGRATION_HPP
+#ifndef ROBOTS_MOTION__ENCODER_DIFFERENTIATION_HPP
+#define ROBOTS_MOTION__ENCODER_DIFFERENTIATION_HPP
 
 #include <stdint.h>
 
@@ -12,7 +12,7 @@ typedef uint16_t(*getEncoderRaw)(void);
 /**
  * Interface to an encoder.
  *
- * This template integrates the steps of an encoder. 
+ * This template differentiate the steps of an encoder. 
  * It can be used for motors and odometry.
  *
  * Template parameter GER (getEncoderRaw) should be a method that returns the raw value of an encoder counter, 
@@ -21,7 +21,7 @@ typedef uint16_t(*getEncoderRaw)(void);
  * If template parameter REVERSED is set to true the counting direction is reversed.
  *
  * Complete Example:
- *   typedef Encoder< Fpga::getEncoderSteps<Fpga::Odometry0 >, true  > MyOdometryLeft;
+ *   typedef EncoderDifferentiation< Fpga::getEncoderSteps<Fpga::Odometry0 >, true  > MyOdometryLeft;
  * 
  * Methods MyOdometryLeft::initialize() must be called during startup and 
  * MyOdometryLeft::run() must be called on a regular basis. 
@@ -30,7 +30,7 @@ typedef uint16_t(*getEncoderRaw)(void);
  *
  */
 template < getEncoderRaw GER, bool REVERSED = false >
-class EncoderIntegration
+class EncoderDifferentiation
 {
 public:
 	static void
@@ -82,12 +82,12 @@ private:
 };
 
 template < getEncoderRaw GER, bool REVERSED >
-int16_t EncoderIntegration< GER, REVERSED >::encoderSteps = 0;
+int16_t EncoderDifferentiation< GER, REVERSED >::encoderSteps = 0;
 
 template < getEncoderRaw GER, bool REVERSED >
-uint16_t EncoderIntegration< GER, REVERSED >::encoderLast = 0;
+uint16_t EncoderDifferentiation< GER, REVERSED >::encoderLast = 0;
 
 }
 }
 
-#endif // ROBOTS_MOTION__ENCODER_INTEGRATION_HPP
+#endif // ROBOTS_MOTION__ENCODER_DIFFERENTIATION_HPP

@@ -1,76 +1,131 @@
-#ifndef ROBOTS_MOTION__ENCODER_STM32_HPP
-#define ROBOTS_MOTION__ENCODER_STM32_HPP
+// coding: utf-8
+/* Copyright (c) 2014, Roboterclub Aachen e.V.
+ * All Rights Reserved.
+ *
+ * The file is part of the xpcc library and is released under the 3-clause BSD
+ * license. See the file `LICENSE` for the full license governing this code.
+ */
+// ----------------------------------------------------------------------------
 
-#include <stdint.h>
+
+#ifndef XPCC_MOTION_STM32_ENCODER_HPP
+#define XPCC_MOTION_STM32_ENCODER_HPP
+
+
+/* Example Hardware Configuration
+ * ==============================
+ *  struct EncoderAConfiguration {
+ *  	typedef GpioChannelB4 ChannelA;
+ *  	typedef GpioChannelB5 ChannelB;
+ *  	static constexpr xpcc::stm32::Gpio::InputType ChannelAInputType
+ *  		= xpcc::stm32::Gpio::InputType::Floating;
+ *  	static constexpr xpcc::stm32::Gpio::InputType ChannelBInputType
+ *  		= xpcc::stm32::Gpio::InputType::Floating;
+ *  	typedef Timer xpcc::stm32::Timer3;
+ *  }
+*/
+namespace xpcc
+{
+namespace motion
+{
+namespace stm32
+{
 
 /**
  * Use a Timer of STM32 in slave mode to read a quadrature encoder.
  *
- * Template parameter TIMER must be one of the Advanced Timers.
- * Template parameter GPIO_A and GPIO_B must be channel 1 and 2 pins
+ * Configuration parameter Timer must be one of the Advanced Timers.
+ * Template parameter ChannelA and ChannelB must be channel 1 and 2 pins
  * of the corresponding timer connected to signal A and B, respectively, 
  * of the quadrature encoder.
  *
  * run() must be called on a regular basis and the getEncoderRaw() returns
  * the current counter value.
  *
- * This encoder can then be used in encoder integration.
+ * This encoder can then be used in encoder differentiation.
  *
  * Example:
- *   typedef EncoderStm32< xpcc::stm32::Timer3, Carrier::Encoder0A, Carrier::Encoder0B> Stm32EncoderLeft;
+ *	struct EncoderConfiguration {
+ *		typedef Timer1          Timer;
+ *		typedef GpioInputA8     ChannelA;
+ *		static constexpr Gpio::InputType ChannelAInputType =
+ *			Gpio::InputType::Floating;	// there are external pullups to 5V
+ *		typedef GpioInputA9     ChannelB;
+ *		static constexpr Gpio::InputType ChannelBInputType =
+ *			Gpio::InputType::Floating;	// there are external pullups to 5V
+ *	};
  *
- * Run one:
+ * typedef Encoder< EncoderConfiguration > Stm32EncoderLeft;
+ *
+ * Run once:
  *   initialize();
  *
  * Run on regular basis (e.g. 1 ms in interrupt handler)
  * 	run()
  *
+ * Then use 
+ *  getCounterRaw()
+ * to get the latest counter value
  */
-namespace robots {
-namespace motion {
 
-template < typename TIMER, typename GPIO_A, typename GPIO_B >
-class EncoderStm32
+template<typename Configuration>
+class Encoder
 {
-public:
-	typedef uint16_t EncoderT;
+private:
+	/// gpio pin connected to channel A
+	typedef typename Configuration::ChannelA ChannelA;
+	/// gpio pin connected to channel B
+	typedef typename Configuration::ChannelB ChannelB;
+	/// input configuration of channel A
+	static constexpr xpcc::stm32::Gpio::InputType ChannelAInputType
+		= Configuration::ChannelAInputType;
+	/// input configuration of channel B
+	static constexpr xpcc::stm32::Gpio::InputType ChannelBInputType
+		= Configuration::ChannelAInputType;
+	/// advanced or general purpose timer that will be conncted to inputs A and B
+	typedef typename Configuration::Timer Timer;
 
+public:
+	typedef uint16_t CounterT;
+
+	/// Intializes the timer and pins in encoder mode.
 	static inline void
 	initialize()
 	{
-		GPIO_A::connect(TIMER::Channel1, GPIO_A::InputType::PullUp);
-		GPIO_B::connect(TIMER::Channel2, GPIO_B::InputType::PullUp);
-
-		TIMER::enable();
-		TIMER::setMode(TIMER::Mode::UpCounter, TIMER::SlaveMode::Encoder3);
-		TIMER::setOverflow(0xffff);
-		TIMER::start();
-	}
+		Timer::enable();
+		Timer::setMode(Timer::Mode::UpCounter, Timer::SlaveMode::Encoder3);
+		// Overflow must be 16bit because else a lot of our motor controll code will break!
+		Timer::setOverflow(0xffff);
+		ChannelA::connect(Timer::Channel1, ChannelAInputType);
+		ChannelB::connect(Timer::Channel2, ChannelBInputType);
+		Timer::start();
+	};
 
 	// Sample the counter value to member variable
 	static inline void
 	run()
 	{
-		encoderRaw = TIMER::getValue();
+		counterRaw = Timer::getValue();
 	}
 
 	// Get the raw counter value from last sample point
-	static inline EncoderT
-	getEncoderRaw()
+	static inline CounterT
+	getCounterRaw()
 	{
-		return encoderRaw;
+		return counterRaw;
 	}
 
 private:
 	static
-	EncoderT encoderRaw;
+	CounterT counterRaw;
 };
 
-template < typename TIMER, typename GPIO_A, typename GPIO_B >
-typename EncoderStm32<TIMER, GPIO_A, GPIO_B>::EncoderT
-EncoderStm32<TIMER, GPIO_A, GPIO_B>::encoderRaw;
+template<typename Configuration>
+typename Encoder<Configuration>::CounterT
+Encoder<Configuration>::counterRaw;
 
-}
-}
+}	// namespace stm32
+}	// namespace motion
+}	// namespace xpcc
 
-#endif /* ROBOTS_MOTION__ENCODER_STM32_HPP */
+#endif // XPCC_MOTION_STM32_ENCODER_HPP
