@@ -2,6 +2,7 @@
 #define	ROBOT_RESULT_HPP
 
 #include "communication/packets.hpp"
+#include <xpcc/communication/xpcc/postman/response.hpp>
 
 namespace robot
 {
