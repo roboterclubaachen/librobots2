@@ -18,8 +18,7 @@ public:
 
 	void
 	actionAwake(
-			const xpcc::ResponseHandle& handler,
-			const robot::packet::TeamColour *payload);
+			const xpcc::ResponseHandle& handler);
 };
 }
 

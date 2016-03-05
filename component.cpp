@@ -16,8 +16,7 @@ robot::Component::actionPing(const xpcc::ResponseHandle& handler)
 
 // ----------------------------------------------------------------------------
 void
-robot::Component::actionAwake(const xpcc::ResponseHandle& handler,
-		const robot::packet::TeamColour */*payload*/)
+robot::Component::actionAwake(const xpcc::ResponseHandle& handler)
 {
 	this->sendNegativeResponse(handler);
 }
