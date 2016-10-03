@@ -94,7 +94,7 @@ public:
 	{
 		Timer::enable();
 		Timer::setMode(Timer::Mode::UpCounter, Timer::SlaveMode::Encoder3);
-		// Overflow must be 16bit because else a lot of our motor controll code will break!
+		// Overflow must be 16bit because else a lot of our motor control code will break!
 		Timer::setOverflow(0xffff);
 		ChannelA::connect(Timer::Channel1, ChannelAInputType);
 		ChannelB::connect(Timer::Channel2, ChannelBInputType);
