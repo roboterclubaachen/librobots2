@@ -3,7 +3,7 @@
 
 // ----------------------------------------------------------------------------
 robot::Component::Component(uint8_t ownIdentifier, xpcc::Dispatcher *communication) : 
-	xpcc::AbstractComponent(ownIdentifier, communication)
+	xpcc::AbstractComponent(ownIdentifier, *communication)
 {
 }
 
