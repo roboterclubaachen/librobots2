@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE rca SYSTEM "rca_events.dtd">
+<rca version="1.0">
+<!-- Elementary Datatypes -->
+<include>common_packets.xml</include>
+
+<event name="Emergency Off Active" type="Bool" id="0x30" />
+
+</rca>
