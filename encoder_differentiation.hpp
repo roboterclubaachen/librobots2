@@ -40,9 +40,10 @@ public:
 	}
 
 	/**
-	 * Get the steps of an encoder.
+	 * Get the steps of an encoder since last run().
 	 *
 	 * Returns the number of steps the encoder counted since last run().
+	 * Encoder Reversion is considered.
 	 * Call run() on a regular basis.
 	 */
 	static inline int16_t
@@ -52,19 +53,32 @@ public:
 	}
 
 	/**
+	 * Get the counter value of an encoder since last run().
+	 *
+	 * Returns the counter value of an encoder at the time of the last run().
+	 * Encoder Reversion is considered.
+	 * Call run() on a regular basis.
+	 */
+	static inline int16_t
+	getEncoderRaw()
+	{
+		return encoderLast;
+	}
+
+	/**
 	 * must be called from on a regular basis (e.g. 1ms) at the same frequency as the underlying encoder.
 	 * Read raw encoder counter value and calculate number of steps moved since last call
 	 */
 	static inline void
 	run()
-    {
+	{
 		uint16_t encoderCurrent = GER();
+		if (REVERSED) {
+			encoderCurrent = -encoderCurrent;
+		}
 
 		encoderSteps = encoderCurrent - encoderLast;
 		encoderLast = encoderCurrent;
-		if (REVERSED) {
-			encoderSteps = -encoderSteps;
-		}
 	}
 
 private:
