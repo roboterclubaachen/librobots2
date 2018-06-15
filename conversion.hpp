@@ -1,11 +1,11 @@
 
-#ifndef	ROBOT__CONVERSION_HPP
-#define	ROBOT__CONVERSION_HPP
+#ifndef	ROBOT_CONVERSION_HPP
+#define	ROBOT_CONVERSION_HPP
 
-#include <xpcc/math/geometry/vector.hpp>
-#include <xpcc/math/geometry/location_2d.hpp>
-#include <xpcc/math/geometry/line_2d.hpp>
-#include <xpcc/math/geometry/line_segment_2d.hpp>
+#include <modm/math/geometry/vector.hpp>
+#include <modm/math/geometry/location_2d.hpp>
+#include <modm/math/geometry/line_2d.hpp>
+#include <modm/math/geometry/line_segment_2d.hpp>
 
 #include "communication/packets.hpp"
 
@@ -16,32 +16,32 @@ namespace robot
 //	inline T
 //	convert(const U&);
 	
-	// robot::packet::Position <-> xpcc::Vector2D<T>
+	// robot::packet::Position <-> modm::Vector2D<T>
 	template <typename T>
-	inline xpcc::Vector<T, 2>
+	inline modm::Vector<T, 2>
 	convert(const robot::packet::Position& in)
 	{
-		return xpcc::Vector<T, 2>(in.x, in.y);
+		return modm::Vector<T, 2>(in.x, in.y);
 	}
 	
 	template <typename U>
 	inline robot::packet::Position
-	convert(const xpcc::Vector<U, 2>& in)
+	convert(const modm::Vector<U, 2>& in)
 	{
 		return robot::packet::Position(in.getX(), in.getY());
 	}
 	
-	// robot::packet::Location <-> xpcc::Location2D<T>
+	// robot::packet::Location <-> modm::Location2D<T>
 	template <typename T>
-	inline xpcc::Location2D<T>
+	inline modm::Location2D<T>
 	convert(const robot::packet::Location& in)
 	{
-		return xpcc::Location2D<T>(in.x, in.y, in.phi);
+		return modm::Location2D<T>(in.x, in.y, in.phi);
 	}
 	
 	template <typename U>
 	inline robot::packet::Location
-	convert(const xpcc::Location2D<U>& in)
+	convert(const modm::Location2D<U>& in)
 	{
 		return robot::packet::Location(
 				in.getPosition().getX(),
@@ -49,19 +49,19 @@ namespace robot
 				in.getOrientation());
 	}
 	
-	// robot::packet::Line <-> xpcc::Line2D<T>
+	// robot::packet::Line <-> modm::Line2D<T>
 	template <typename T>
-	inline xpcc::LineSegment2D<T>
+	inline modm::LineSegment2D<T>
 	convert(const robot::packet::Line& in)
 	{
-		return xpcc::LineSegment2D<T>(
-				xpcc::Vector<T, 2>( in.start.x, in.start.y ),
-				xpcc::Vector<T, 2>( in.end.x, in.end.y ) );
+		return modm::LineSegment2D<T>(
+				modm::Vector<T, 2>( in.start.x, in.start.y ),
+				modm::Vector<T, 2>( in.end.x, in.end.y ) );
 	}
 
 	template <typename U>
 	inline robot::packet::Line
-	convert(const xpcc::Line2D<U>& in)
+	convert(const modm::Line2D<U>& in)
 	{
 		return robot::packet::Line(
 				in.getPoint().getX(),
@@ -72,7 +72,7 @@ namespace robot
 
 	template <typename U>
 	inline robot::packet::Line
-	convert(const xpcc::LineSegment2D<U>& in)
+	convert(const modm::LineSegment2D<U>& in)
 	{
 		return robot::packet::Line(
 				in.getStartPoint().getX(),
@@ -148,4 +148,4 @@ inline robot::packet::ViewingDirection operator !(const robot::packet::ViewingDi
 	}
 }
 
-#endif // ROBOT__CONVERSION_HPP
+#endif // ROBOT_CONVERSION_HPP

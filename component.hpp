@@ -1,8 +1,8 @@
 
-#ifndef ROBOT__COMPONENT_HPP
-#define	ROBOT__COMPONENT_HPP
+#ifndef ROBOT_COMPONENT_HPP
+#define	ROBOT_COMPONENT_HPP
 
-#include <xpcc/communication/xpcc/abstract_component.hpp>
+#include <modm/communication/xpcc/abstract_component.hpp>
 
 #include "communication/packets.hpp"
 
@@ -22,4 +22,4 @@ public:
 };
 }
 
-#endif	// ROBOT__COMPONENT_HPP
+#endif	// ROBOT_COMPONENT_HPP
