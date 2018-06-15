@@ -2,14 +2,14 @@
 /* Copyright (c) 2014, Roboterclub Aachen e.V.
  * All Rights Reserved.
  *
- * The file is part of the xpcc library and is released under the 3-clause BSD
+ * The file is part of the modm library and is released under the 3-clause BSD
  * license. See the file `LICENSE` for the full license governing this code.
  */
 // ----------------------------------------------------------------------------
 
 
-#ifndef XPCC_MOTION_STM32_ENCODER_HPP
-#define XPCC_MOTION_STM32_ENCODER_HPP
+#ifndef ROBOTS_MOTION_STM32_ENCODER_HPP
+#define ROBOTS_MOTION_STM32_ENCODER_HPP
 
 
 /* Example Hardware Configuration
@@ -17,14 +17,15 @@
  *  struct EncoderAConfiguration {
  *  	typedef GpioChannelB4 ChannelA;
  *  	typedef GpioChannelB5 ChannelB;
- *  	static constexpr xpcc::stm32::Gpio::InputType ChannelAInputType
- *  		= xpcc::stm32::Gpio::InputType::Floating;
- *  	static constexpr xpcc::stm32::Gpio::InputType ChannelBInputType
- *  		= xpcc::stm32::Gpio::InputType::Floating;
- *  	typedef Timer xpcc::stm32::Timer3;
+ *		typedef Timer modm::platform::Timer3;
+ *		static inline void connect() {
+ *			ChannelA::configure(Gpio::InputType::Floating);
+ *			ChannelB::configure(Gpio::InputType::Floating);
+ *			Timer::connect<ChannelA::Ch1, ChannelB::Ch2>();
+ *		}
  *  }
 */
-namespace xpcc
+namespace robots
 {
 namespace motion
 {
@@ -36,7 +37,7 @@ namespace stm32
  *
  * Configuration parameter Timer must be one of the Advanced Timers.
  * Template parameter ChannelA and ChannelB must be channel 1 and 2 pins
- * of the corresponding timer connected to signal A and B, respectively, 
+ * of the corresponding timer connected to signal A and B, respectively,
  * of the quadrature encoder.
  *
  * run() must be called on a regular basis and the getEncoderRaw() returns
@@ -63,7 +64,7 @@ namespace stm32
  * Run on regular basis (e.g. 1 ms in interrupt handler)
  * 	run()
  *
- * Then use 
+ * Then use
  *  getCounterRaw()
  * to get the latest counter value
  */
@@ -77,10 +78,10 @@ private:
 	/// gpio pin connected to channel B
 	typedef typename Configuration::ChannelB ChannelB;
 	/// input configuration of channel A
-	static constexpr xpcc::stm32::Gpio::InputType ChannelAInputType
+	static constexpr modm::platform::Gpio::InputType ChannelAInputType
 		= Configuration::ChannelAInputType;
 	/// input configuration of channel B
-	static constexpr xpcc::stm32::Gpio::InputType ChannelBInputType
+	static constexpr modm::platform::Gpio::InputType ChannelBInputType
 		= Configuration::ChannelAInputType;
 	/// advanced or general purpose timer that will be conncted to inputs A and B
 	typedef typename Configuration::Timer Timer;
@@ -96,8 +97,7 @@ public:
 		Timer::setMode(Timer::Mode::UpCounter, Timer::SlaveMode::Encoder3);
 		// Overflow must be 16bit because else a lot of our motor control code will break!
 		Timer::setOverflow(0xffff);
-		ChannelA::connect(Timer::Channel1, ChannelAInputType);
-		ChannelB::connect(Timer::Channel2, ChannelBInputType);
+		Configuration::connect();
 		Timer::start();
 	};
 
@@ -126,6 +126,6 @@ Encoder<Configuration>::counterRaw;
 
 }	// namespace stm32
 }	// namespace motion
-}	// namespace xpcc
+}	// namespace robots
 
-#endif // XPCC_MOTION_STM32_ENCODER_HPP
+#endif // ROBOTS_MOTION_STM32_ENCODER_HPP
