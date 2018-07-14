@@ -1,3 +1,14 @@
+/*
+ * Copyright (c) 2014, Kevin Läufer
+ * Copyright (c) 2014, strongly-typed
+ * Copyright (c) 2017, Georgi Grinshpun
+ * Copyright (c) 2018, Niklas Hauser
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 #ifndef ROBOTS_MOTION_ENCODER_DIFFERENTIATION_HPP
 #define ROBOTS_MOTION_ENCODER_DIFFERENTIATION_HPP
 
