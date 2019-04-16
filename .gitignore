@@ -1,0 +1,7 @@
+__pycache__/
+.sconsign.dblite
+
+*~
+
+# KDE directory preferences
+.directory
