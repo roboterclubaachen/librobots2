@@ -7,20 +7,19 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 def init(module):
-    module.parent = "motor-can"
     module.name = "slave"
 
 def prepare(module, options):
     module.depends(
-        "modm:platform:core",
         "modm:architecture:atomic",
         "modm:platform:can.common",
         "modm:processing:timer",
-        "motor-can:common",
+        ":common",
     )
     return True
 
 def build(env):
-    env.outbasepath = "modm/motor-can"
-    env.copy("motor-can_slave.hpp")
-    env.copy("motor-can_slave_impl.hpp")
+    env.outbasepath = "motor-can/src/motor-can"
+    env.copy("motor_board.hpp")
+    env.copy("slave.hpp")
+    env.copy("slave_impl.hpp")

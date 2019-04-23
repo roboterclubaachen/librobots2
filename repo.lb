@@ -8,9 +8,10 @@
 
 def init(repo):
     repo.name = "motor-can"
+    repo.description = FileReader("README.md")
 
 def prepare(repo, options):
-    repo.find_modules_recursive(".", modulefile="*.lb")
+    repo.add_modules_recursive(".", modulefile="*.lb")
 
 def build(env):
-    env.add_metadata("include_path", "motor-can/src")
+    env.collect("modm:build:path.include", "motor-can/src")

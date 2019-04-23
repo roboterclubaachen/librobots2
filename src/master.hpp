@@ -1,5 +1,4 @@
-/* alpha_motor.hpp
- *
+/*
  * Copyright (C) 2019 Raphael Lehmann <raphael@rleh.de>
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -10,7 +9,7 @@
 #ifndef MOTOR_CAN_MASTER_HPP
 #define MOTOR_CAN_MASTER_HPP
 
-#include "motor-can.hpp"
+#include "motor_configuration.hpp"
 
 #include <array>
 #include <modm/processing/timer/timeout.hpp>
@@ -63,54 +62,12 @@ public:
 	transmit();
 
 public:
-	// ---------------------------------------------------------------------------
-	// Motor access functions
-
-	/**
-	 * Disables a motor, no current flows through the winding.
-	 */
-	template < uint8_t MotorId >
-	static inline void
-	disable();
-
-	/**
-	 * Set the PWM value of a motor. Positive PWM means driving forward.
-	 */
-	template < uint8_t MotorId >
-	static inline void
-	setPwm(int16_t pwm);
-
-	/**
-	 * Set the maximum current.
-	 *
-	 * When the maximum current is reached the overcurrent flag is set.
-	 */
-	template < uint8_t MotorId >
-	static void
-	setCurrentLimit(uint16_t currentLimit);
-
-	/**
-	 * Get the current of the motor.
-	 */
-	template < uint8_t MotorId >
-	static uint16_t
-	getCurrent();
-
-	/**
-	 * Get the raw value of the encoder counter
-	 */
-	template < uint8_t MotorId >
-	static uint16_t
-	getEncoderCounterRaw();
-
-private:
 	// Shadow registers of PWM, encoder, current (target, actual)
 	class DataTx
 	{
 	public:
-		std::array<uint8_t, 8> toMessageData() const
+		void toMessageData(uint8_t* a) const
 		{
-			std::array<uint8_t, 8> a;
 			a[0] = pwmM1 >> 8;
 			a[1] = pwmM1 & 0xff;
 			a[2] = pwmM2 >> 8;
@@ -119,7 +76,6 @@ private:
 			a[5] = currentLimitM1 & 0xff;
 			a[6] = currentLimitM2 >> 8;
 			a[7] = currentLimitM2 & 0xff;
-			return a;
 		}
 
 	public:
@@ -145,7 +101,7 @@ private:
 		// assignment operator
 		// T& T::operator =(const T2& b);
 		//DataRx(std::array<uint8_t, 8> data)
-		DataRx& operator=(const std::array<uint8_t, 8> data)
+		void operator=(const uint8_t* data)
 		{
 			encoderCounterRawM1 = (data[0] << 8) | data[1];
 			encoderCounterRawM2 = (data[2] << 8) | data[3];
@@ -170,19 +126,19 @@ private:
 	static_assert(sizeof(DataTx) <= 8, "DataTx struct is too large for a CAN message.");
 	static_assert(sizeof(DataRx) <= 8, "DataRx struct is too large for a CAN message.");
 
-	static std::array<DataTx, Configuration::BoardCount>
+	static inline std::array<DataTx, Configuration::BoardCount>
 	dataTx;
 
-	static std::array<DataRx, Configuration::BoardCount>
+	static inline std::array<DataRx, Configuration::BoardCount>
 	dataRx;
 
 private:
-	static std::array<modm::ShortTimeout, Configuration::BoardCount>
+	static inline std::array<modm::ShortTimeout, Configuration::BoardCount>
 	aliveTimer;
 };
 
 } // namespace motorCan
 
-#include "motor-can_master_impl.hpp"
+#include "master_impl.hpp"
 
 #endif // MOTOR_CAN_MASTER_HPP

@@ -1,5 +1,4 @@
-/* alpha_motor.hpp
- *
+/*
  * Copyright (C) 2019 Raphael Lehmann <raphael@rleh.de>
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -7,8 +6,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef MOTOR_HPP
-#define MOTOR_HPP
+#ifndef MOTOR_CAN_MOTOR_HPP
+#define MOTOR_CAN_MOTOR_HPP
 
 namespace motorCan
 {
@@ -29,29 +28,22 @@ class Motor
 {
 public:
 	static void
-	initialize();
+	initialize() {};
+
+	//static void
+	//run() {};
 
 	static void
-	run();
-
-	enum struct MotorMode {
-		MotorBreak,
-		Pwm,
-		Current,
-		PwmWithCurrentLimit,
-	}
+	disable();
 
 	static void
-	setMode(MotorMode m);
-
-	static void
-	setDirection(bool direction);
-
-	static void
-	setPwm(uint16_t pwm);
+	setPwm(int16_t pwm);
 
 	static void
 	setCurrent(uint16_t current);
+
+	static inline void
+	setCurrentLimit(uint16_t current) { setCurrent(current); }
 
 	static bool
 	isCurrentOverLimit();
@@ -63,4 +55,6 @@ public:
 
 } // namespace motorCan
 
-#endif // MOTOR_HPP
+#include "motor_impl.hpp"
+
+#endif // MOTOR_CAN_MOTOR_HPP

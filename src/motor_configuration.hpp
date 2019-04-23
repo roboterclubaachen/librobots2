@@ -1,5 +1,4 @@
-/* alpha_motor.hpp
- *
+/*
  * Copyright (C) 2019 Raphael Lehmann <raphael@rleh.de>
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -7,8 +6,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef MOTOR_CAN_HPP
-#define MOTOR_CAN_HPP
+#ifndef MOTOR_CAN_MOTOR_CONFIGURATION_HPP
+#define MOTOR_CAN_MOTOR_CONFIGURATION_HPP
 
 #include <stdint.h>
 #include <modm/io/iostream.hpp>
@@ -51,7 +50,7 @@ public:
 
 	// ID of the first motor reply packets
 	static constexpr uint16_t
-	base_id_reply = 0x20;
+	base_id_reply = 0x80;
 
 public:
 	static constexpr std::array<motorCan::BoardConfig, BoardCount>
@@ -68,6 +67,7 @@ public:
 } // namespace motorCan
 
 
+/*
 inline const char*
 enumToString(motorCan::BoardConfig b)
 {
@@ -90,5 +90,6 @@ operator << (::modm::IOStream& s, const motorCan::BoardConfig b)
 }
 
 } // namespace motorCan
+*/
 
-#endif /* MOTOR_CAN_HPP */
+#endif // MOTOR_CAN_MOTOR_CONFIGURATION_HPP

@@ -1,5 +1,4 @@
-/* alpha_motor.hpp
- *
+/*
  * Copyright (C) 2019 Raphael Lehmann <raphael@rleh.de>
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -12,7 +11,7 @@
 
 #include <stdint.h>
 
-#include "motor-can.hpp"
+#include "motor_configuration.hpp"
 
 #include <array>
 #include <modm/processing/timer/timeout.hpp>
@@ -28,7 +27,7 @@ namespace motorCan
  *
  * update() must be called at a frequency of 2 milliseconds or faster.
  */
-template < typename CAN_BUS >
+template < typename CAN_BUS, typename MotorBoard >
 class MotorCanSlave
 {
 public:
@@ -49,7 +48,7 @@ private:
 	class DataToMotor
 	{
 	public:
-		void updateFromMessageData(std::array<uint8_t, 8> data)
+		void updateFromMessageData(uint8_t* data)
 		{
 			pwmM1 = (data[0] << 8) | data[1];
 			pwmM2 = (data[2] << 8) | data[3];
@@ -76,9 +75,8 @@ private:
 	class DataFromMotor
 	{
 	public:
-		std::array<uint8_t, 8> toMessageData()
+		void toMessageData(uint8_t* a)
 		{
-			std::array<uint8_t, 8> a;
 			a[0] = encoderCounterRawM1 >> 8;
 			a[1] = encoderCounterRawM1 & 0xff;
 			a[2] = encoderCounterRawM2 >> 8;
@@ -87,7 +85,6 @@ private:
 			a[5] = currentM1 & 0xff;
 			a[6] = currentM2 >> 8;
 			a[7] = currentM2 & 0xff;
-			return a;
 		}
 	public:
 		uint16_t encoderCounterRawM1;
@@ -99,10 +96,10 @@ private:
 		int16_t currentM2;
 	} __attribute__((packed));
 
-	static uint8_t boardId;
+	static inline uint8_t boardId;
 
-	static DataToMotor dataToMotor;
-	static DataFromMotor dataFromMotor;
+	static inline DataToMotor dataToMotor;
+	static inline DataFromMotor dataFromMotor;
 
 private:
 	static inline void
@@ -111,11 +108,11 @@ private:
 	static inline void
 	receive();
 
-	static modm::ShortTimeout aliveTimer;
+	static inline modm::ShortTimeout aliveTimer;
 };
 
 } // namespace motorCan
 
-#include "motor-can_slave_impl.hpp"
+#include "slave_impl.hpp"
 
 #endif /* MOTOR_CAN_SLAVE_HPP */

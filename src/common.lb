@@ -1,21 +1,20 @@
 #!/usr/bin/env python3
 #
-# Copyright (c) 2018, Raphael Lehmann
+# Copyright (c) 2018-2019, Raphael Lehmann
 #
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 def init(module):
-    module.parent = "motor-can"
     module.name = "common"
 
 def prepare(module, options):
 	module.depends(
-		"modm:platform:core",
+		"modm:io",
 	)
 	return True
 
 def build(env):
-    env.outbasepath = "modm/motor-can"
-    env.copy("motor-can.hpp")
+    env.outbasepath = "motor-can/src/motor-can"
+    env.copy("motor_configuration.hpp")
