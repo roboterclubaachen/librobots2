@@ -29,7 +29,7 @@ class Configuration
 public:
 	// A board is a microcontroller two motors (or less)
 	static constexpr uint8_t
-	BoardCount =  6;
+	BoardCount =  4;
 
 	// All motors are enumerated from 0 to MotorCount - 1.
 	static constexpr uint8_t
@@ -51,17 +51,6 @@ public:
 	// ID of the first motor reply packets
 	static constexpr uint16_t
 	base_id_reply = 0x80;
-
-public:
-	static constexpr std::array<motorCan::BoardConfig, BoardCount>
-	BoardConfigs {
-		motorCan::BoardConfig::DoubleBLDC,
-		motorCan::BoardConfig::DoubleBLDC,
-		motorCan::BoardConfig::SingleBLDCSingleDC,
-		motorCan::BoardConfig::DoubleDC,
-		motorCan::BoardConfig::DoubleDC,
-		motorCan::BoardConfig::DoubleDC,
-	};
 };
 
 } // namespace motorCan
