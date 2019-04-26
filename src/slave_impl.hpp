@@ -11,6 +11,7 @@
 #endif
 
 #include <type_traits>
+#include <limits>
 #include <modm/platform/can/can_2.hpp>
 
 namespace motorCan {
@@ -70,10 +71,21 @@ MotorCanSlave< CAN_BUS, MotorBoard >::sampleMotors() {
 template < typename CAN_BUS, typename MotorBoard >
 void
 MotorCanSlave< CAN_BUS, MotorBoard >::updateMotors() {
-	MotorBoard::setPwm(MotorBoard::Motor::M1, dataToMotor.pwmM1);
-	MotorBoard::setPwm(MotorBoard::Motor::M2, dataToMotor.pwmM2);
-	MotorBoard::setCurrentLimit(MotorBoard::Motor::M1, dataToMotor.currentLimitM1);
-	MotorBoard::setCurrentLimit(MotorBoard::Motor::M2, dataToMotor.currentLimitM2);
+	using namespace MotorBoard::Motor;
+	if(dataToMotor.pwmM1 == std::numeric_limits<int16_t>) {
+		MotorBoard::disable(M1);
+	}
+	else {
+		MotorBoard::setPwm(M1, dataToMotor.pwmM1);
+	}
+	if(dataToMotor.pwmM2 == std::numeric_limits<int16_t>) {
+		MotorBoard::disable(M2);
+	}
+	else {
+		MotorBoard::setPwm(M2, dataToMotor.pwmM2);
+	}
+	MotorBoard::setCurrentLimit(M1, dataToMotor.currentLimitM1);
+	MotorBoard::setCurrentLimit(M2, dataToMotor.currentLimitM2);
 };
 
 // ----------------------------------------------------------------------------

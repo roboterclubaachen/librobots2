@@ -10,6 +10,8 @@
 #error "Do not include this file directly. Include motor.hpp instead."
 #endif
 
+#include <limits>
+
 namespace motorCan
 {
 template< class CommMaster, uint8_t MotorId>
@@ -20,12 +22,10 @@ Motor<CommMaster, MotorId>::disable()
 	modm::atomic::Lock lock;
 
 	if constexpr(MotorId % 2 == 0){
-		CommMaster::dataTx[MotorId / 2].pwmM1 = 0;
-		CommMaster::dataTx[MotorId / 2].currentLimitM1 = 0;
+		CommMaster::dataTx[MotorId / 2].pwmM1 = std::numeric_limits<int16_t>;
 	}
 	else {
-		CommMaster::dataTx[MotorId / 2].pwmM2 = 0;
-		CommMaster::dataTx[MotorId / 2].currentLimitM2 = 0;
+		CommMaster::dataTx[MotorId / 2].pwmM2 = std::numeric_limits<int16_t>;
 	}
 }
 
@@ -63,7 +63,7 @@ template< class CommMaster, uint8_t MotorId>
 bool
 Motor<CommMaster, MotorId>::isCurrentOverLimit()
 {
-	return false; // TODO
+	return false; // alpha motor never reaches current limit because its over 9000
 }
 
 template< class CommMaster, uint8_t MotorId>

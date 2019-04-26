@@ -31,6 +31,9 @@ public:
 	int16_t
 	getCurrent(Motor motor);
 
+	static
+	void
+	disable(Motor motor);
 
 	static
 	void
