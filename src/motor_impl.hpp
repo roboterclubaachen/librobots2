@@ -22,10 +22,10 @@ Motor<CommMaster, MotorId>::disable()
 	modm::atomic::Lock lock;
 
 	if constexpr(MotorId % 2 == 0){
-		CommMaster::dataTx[MotorId / 2].pwmM1 = std::numeric_limits<int16_t>;
+		CommMaster::dataTx[MotorId / 2].pwmM1 = std::numeric_limits<int16_t>::min();
 	}
 	else {
-		CommMaster::dataTx[MotorId / 2].pwmM2 = std::numeric_limits<int16_t>;
+		CommMaster::dataTx[MotorId / 2].pwmM2 = std::numeric_limits<int16_t>::min();
 	}
 }
 
