@@ -17,4 +17,5 @@ def prepare(module, options):
 
 def build(env):
     env.outbasepath = "motor-can/src/motor-can"
+    env.copy("motor_board.hpp")
     env.copy("motor_configuration.hpp")
