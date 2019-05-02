@@ -51,8 +51,6 @@ public:
 	static uint16_t
 	getCurrent();
 
-	static uint16_t
-	getEncoderSteps();
 };
 
 } // namespace motorCan
