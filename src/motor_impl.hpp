@@ -80,4 +80,19 @@ Motor<CommMaster, MotorId>::getCurrent()
 	}
 }
 
+template< class CommMaster, uint8_t MotorId>
+uint16_t
+Motor<CommMaster, MotorId>::getEncoderSteps()
+{
+	// Access to _encoder member must be locked
+	modm::atomic::Lock lock;
+
+	if constexpr(MotorId % 2 == 0){
+		return CommMaster::dataRx[MotorId / 2].encoderCounterRawM1;
+	}
+	else {
+		return CommMaster::dataRx[MotorId / 2].encoderCounterRawM2;
+	}
+}
+
 } // namespace motorCan
