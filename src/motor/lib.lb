@@ -15,8 +15,14 @@ def prepare(module, options):
 
 def build(env):
     env.outbasepath = "libmotor/src/libmotor"
+    env.copy("bldc_motor_block_commutation.hpp")
+    env.copy("bldc_motor_block_commutation_impl.hpp")
+    env.copy("block_commutation.hpp")
+    env.copy("block_commutation_impl.hpp")
+    env.copy("block_commutation_private.hpp")
     env.copy("dc_motor.hpp")
     env.copy("dc_motor_impl.hpp")
+    env.copy("hall_permutations.hpp")
     env.copy("motor_base.hpp")
     env.copy("motor_bridge.hpp")
     env.copy("motor_bridge.cpp")
