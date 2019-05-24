@@ -1,0 +1,23 @@
+#!/usr/bin/env python3
+#
+# Copyright (c) 2019, Christopher Durand
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+def init(module):
+    module.name = "lib"
+
+def prepare(module, options):
+    module.depends("modm:build:scons")
+    return True
+
+def build(env):
+    env.outbasepath = "libmotor/src/libmotor"
+    env.copy("motor_base.hpp")
+    env.copy("motor_bridge.hpp")
+    env.copy("motor_bridge.cpp")
+    env.copy("motor_disabled.hpp")
+    env.copy("motor_interface.hpp")
+    env.copy("utility/polymorphic_storage.hpp")
