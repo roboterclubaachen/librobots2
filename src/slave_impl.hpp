@@ -24,22 +24,35 @@ MotorCanSlave< CAN_BUS, MotorBoard >::initialize(uint8_t _boardId)
 
 	using CanFilter = modm::platform::CanFilter;
 
-	// Only receive sync message
-	CanFilter::setFilter(0, CanFilter::FIFO0,
+	MODM_LOG_DEBUG << "[motorCan] boardId = " << boardId << modm::endl;
+
+	CanFilter::setStartFilterBankForCan2(14);
+
+	if constexpr(std::is_same_v<CAN_BUS, modm::platform::Can2>) {
+		// Only receive sync message
+		CanFilter::setFilter(0, CanFilter::FIFO0,
 			CanFilter::StandardIdentifier(0),
 			CanFilter::StandardFilterMask(0x7ff));
 
-	MODM_LOG_DEBUG << "[motorCan] boardId = " << boardId << modm::endl;
-
-	static_assert(std::is_same<CAN_BUS, modm::platform::Can2>::value, "MotorCan currently only runs on Can2.");
-	CanFilter::setStartFilterBankForCan2(14);
-	CanFilter::setFilter(14, CanFilter::FIFO0,
-			CanFilter::StandardIdentifier(Configuration::sync_id),
+		CanFilter::setFilter(14, CanFilter::FIFO0,
+				CanFilter::StandardIdentifier(Configuration::sync_id),
+				CanFilter::StandardFilterMask(0x7ff));
+		CanFilter::setFilter(15, CanFilter::FIFO0,
+				CanFilter::StandardIdentifier(Configuration::base_id + boardId),
+				CanFilter::StandardFilterMask(0x7ff));
+	} else {
+		// Only receive sync message
+		CanFilter::setFilter(14, CanFilter::FIFO0,
+			CanFilter::StandardIdentifier(0),
 			CanFilter::StandardFilterMask(0x7ff));
-	CanFilter::setFilter(15, CanFilter::FIFO0,
-			CanFilter::StandardIdentifier(Configuration::base_id + boardId),
-			CanFilter::StandardFilterMask(0x7ff));
 
+		CanFilter::setFilter(0, CanFilter::FIFO0,
+				CanFilter::StandardIdentifier(Configuration::sync_id),
+				CanFilter::StandardFilterMask(0x7ff));
+		CanFilter::setFilter(1, CanFilter::FIFO0,
+				CanFilter::StandardIdentifier(Configuration::base_id + boardId),
+				CanFilter::StandardFilterMask(0x7ff));
+	}
 	MODM_LOG_DEBUG << "[motorCan] Listening to CAN messages with IDsß 0x" << modm::hex << static_cast<uint8_t>(Configuration::base_id + boardId);
 	MODM_LOG_DEBUG << modm::ascii << " and 0x" << modm::hex << static_cast<uint8_t>(Configuration::sync_id) << modm::ascii << modm::endl;
 
