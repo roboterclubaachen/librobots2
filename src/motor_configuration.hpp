@@ -29,7 +29,7 @@ class Configuration
 public:
 	// A board is a microcontroller two motors (or less)
 	static constexpr uint8_t
-	BoardCount =  4;
+	BoardCount =  5;
 
 	// All motors are enumerated from 0 to MotorCount - 1.
 	static constexpr uint8_t
