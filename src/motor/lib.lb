@@ -1,0 +1,32 @@
+#!/usr/bin/env python3
+#
+# Copyright (c) 2019, Christopher Durand
+# Copyright (c) 2019, Raphael Lehmann
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+def init(module):
+    module.name = ":motor"
+
+def prepare(module, options):
+    module.depends("modm:build:scons")
+    return True
+
+def build(env):
+    env.outbasepath = "librobots2/src/libmotor"
+    env.copy("bldc_motor_block_commutation.hpp")
+    env.copy("bldc_motor_block_commutation_impl.hpp")
+    env.copy("block_commutation.hpp")
+    env.copy("block_commutation_impl.hpp")
+    env.copy("block_commutation_private.hpp")
+    env.copy("dc_motor.hpp")
+    env.copy("dc_motor_impl.hpp")
+    env.copy("hall_permutations.hpp")
+    env.copy("motor_base.hpp")
+    env.copy("motor_bridge.hpp")
+    env.copy("motor_bridge.cpp")
+    env.copy("motor_disabled.hpp")
+    env.copy("motor_interface.hpp")
+    env.copy("utility/polymorphic_storage.hpp")
