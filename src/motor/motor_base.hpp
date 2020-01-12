@@ -15,7 +15,7 @@
 
 #include "motor_interface.hpp"
 
-namespace libmotor
+namespace librobots2::motor
 {
 
 template<typename MotorBridge>

@@ -14,7 +14,7 @@
 
 #include "motor_bridge.hpp"
 
-namespace libmotor
+namespace librobots2::motor
 {
 
 /// Implements block commutations with hall sensors

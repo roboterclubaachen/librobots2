@@ -10,7 +10,7 @@
 #ifndef LIBMOTOR_MOTOR_INTERFACE_HPP
 #define LIBMOTOR_MOTOR_INTERFACE_HPP
 
-namespace libmotor
+namespace librobots2::motor
 {
 
 class MotorInterface

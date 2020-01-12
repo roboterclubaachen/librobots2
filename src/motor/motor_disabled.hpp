@@ -15,7 +15,7 @@
 #include "motor_base.hpp"
 #include "motor_bridge.hpp"
 
-namespace libmotor
+namespace librobots2::motor
 {
 
 /// Dummy motor which disables all outputs

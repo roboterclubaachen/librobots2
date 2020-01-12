@@ -16,7 +16,7 @@
 #include "motor_bridge.hpp"
 
 // Internal definitions
-namespace libmotor::block_commutation
+namespace librobots2::motor::block_commutation
 {
 
 // Lookup table for commutation sequence:

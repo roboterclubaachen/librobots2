@@ -14,7 +14,7 @@
 #include "block_commutation_private.hpp"
 #include "hall_permutations.hpp"
 
-namespace libmotor
+namespace librobots2::motor
 {
 
 template<typename HallPort>

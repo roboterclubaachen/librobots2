@@ -13,7 +13,7 @@
 #include <cstdint>
 #include <array>
 
-namespace libmotor
+namespace librobots2::motor
 {
 
 enum class Phase : uint_fast8_t

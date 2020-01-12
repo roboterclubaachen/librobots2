@@ -14,7 +14,7 @@
 
 #include "motor_base.hpp"
 
-namespace libmotor
+namespace librobots2::motor
 {
 
 /// Control of a BLDC motor with block commutation
