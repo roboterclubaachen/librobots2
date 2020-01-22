@@ -11,6 +11,11 @@ def init(module):
     module.name = ":motor"
 
 def prepare(module, options):
+    module.depends(
+        "modm:build:scons",
+        "modm:architecture:atomic",
+        "modm:platform:core",
+    )
     return True
 
 def build(env):

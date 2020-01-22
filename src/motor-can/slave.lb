@@ -14,7 +14,7 @@ def prepare(module, options):
         "modm:architecture:atomic",
         "modm:platform:can.common",
         "modm:processing:timer",
-        ":common",
+        ":motor-can:common",
     )
     return True
 
