@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<library>
+  <repositories>
+    <repository><path>../../repo.lb</path></repository>
+  </repositories>
+
+  <options>
+    <option name=":target">stm32f407vgt6</option>
+    <option name="modm:build:scons:info.git">Info+Status</option>
+    <option name="modm:build:scons:info.build">True</option>
+  </options>
+
+<modules>
+  <module>librobots2:**</module>
+</modules>
+</library>

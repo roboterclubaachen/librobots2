@@ -1,0 +1,23 @@
+image: modm/modm-build:latest
+
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+
+before_script:
+  - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@git.roboterclub.rwth-aachen.de/rca/rca-ci-helper.git
+  - rca-ci-helper/populate_rca_software.sh
+
+compile-tests:
+  script:
+    - locale -a
+    - scons --version
+    - python --version
+    - python3 --version
+    - which arm-none-eabi-g++
+    - arm-none-eabi-g++ --version
+    - lbuild --version
+    - lbuild -h | head -n1
+    #
+    - cd tests/lbuild-deps
+    - lbuild build
+    - scons
