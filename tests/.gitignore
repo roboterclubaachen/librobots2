@@ -1,0 +1,6 @@
+# generated paths and files by lbuild
+build/
+librobots2/
+modm/
+project.xml.log
+SConstruct
