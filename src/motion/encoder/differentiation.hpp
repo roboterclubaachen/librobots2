@@ -9,13 +9,12 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef ROBOTS_MOTION_ENCODER_DIFFERENTIATION_HPP
-#define ROBOTS_MOTION_ENCODER_DIFFERENTIATION_HPP
+#ifndef LIBROBOTS2_MOTION_ENCODER_DIFFERENTIATION_HPP
+#define LIBROBOTS2_MOTION_ENCODER_DIFFERENTIATION_HPP
 
 #include <stdint.h>
 
-namespace robots {
-namespace motion {
+namespace librobots2::motion::encoder
 
 // Signature for all valid template params
 typedef uint16_t(*getEncoderRaw)(void);
@@ -112,7 +111,6 @@ int16_t EncoderDifferentiation< GER, REVERSED >::encoderSteps = 0;
 template < getEncoderRaw GER, bool REVERSED >
 uint16_t EncoderDifferentiation< GER, REVERSED >::encoderLast = 0;
 
-}
-}
+}      // namespace librobots2::encoder::motion
 
-#endif // ROBOTS_MOTION_ENCODER_DIFFERENTIATION_HPP
+#endif // LIBROBOTS2_MOTION_ENCODER_DIFFERENTIATION_HPP

@@ -19,8 +19,8 @@
 // ----------------------------------------------------------------------------
 
 
-#ifndef ROBOTS_MOTION_STM32_ENCODER_HPP
-#define ROBOTS_MOTION_STM32_ENCODER_HPP
+#ifndef LIBROBOTS2_MOTION_ENCODER_STM32_HPP
+#define LIBROBOTS2_MOTION_ENCODER_STM32_HPP
 
 
 /* Example Hardware Configuration
@@ -36,11 +36,7 @@
  *		}
  *  }
 */
-namespace robots
-{
-namespace motion
-{
-namespace stm32
+namespace librobots2::motion::encoder::stm32
 {
 
 /**
@@ -135,8 +131,6 @@ template<typename Configuration>
 typename Encoder<Configuration>::CounterT
 Encoder<Configuration>::counterRaw;
 
-}	// namespace stm32
-}	// namespace motion
-}	// namespace robots
+}	// namespace librobots2::motion::encoder::stm32
 
-#endif // ROBOTS_MOTION_STM32_ENCODER_HPP
+#endif // LIBROBOTS2_MOTION_ENCODER_STM32_HPP
