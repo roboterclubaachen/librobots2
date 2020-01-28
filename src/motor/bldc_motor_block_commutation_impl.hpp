@@ -13,7 +13,7 @@
 
 #include "block_commutation.hpp"
 
-namespace libmotor
+namespace librobots2::motor
 {
 
 template<typename MotorBridge>

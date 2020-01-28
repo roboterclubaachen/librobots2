@@ -14,7 +14,7 @@
 
 #include "motor_base.hpp"
 
-namespace libmotor
+namespace librobots2::motor
 {
 
 /// Control of a DC motor connected to two phases of a three-phase bridge

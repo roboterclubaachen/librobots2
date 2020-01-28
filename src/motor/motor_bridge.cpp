@@ -9,7 +9,7 @@
 
 #include "motor_bridge.hpp"
 
-namespace libmotor
+namespace librobots2::motor
 {
 
 PhaseConfig BridgeConfig::get(Phase phase) const

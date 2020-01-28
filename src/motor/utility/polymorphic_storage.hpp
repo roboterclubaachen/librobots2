@@ -13,7 +13,7 @@
 #include <variant>
 #include <type_traits>
 
-namespace libmotor
+namespace librobots2::motor
 {
 
 /// std::variant wrapper for types of a common base class

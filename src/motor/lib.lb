@@ -11,11 +11,10 @@ def init(module):
     module.name = ":motor"
 
 def prepare(module, options):
-    module.depends("modm:build:scons")
     return True
 
 def build(env):
-    env.outbasepath = "librobots2/src/libmotor"
+    env.outbasepath = "librobots2/src/librobots2/motor"
     env.copy("bldc_motor_block_commutation.hpp")
     env.copy("bldc_motor_block_commutation_impl.hpp")
     env.copy("block_commutation.hpp")

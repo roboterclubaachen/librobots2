@@ -13,7 +13,7 @@
 #include <tuple>
 #include <cstdint>
 
-namespace libmotor
+namespace librobots2::motor
 {
 
 template<typename Port>

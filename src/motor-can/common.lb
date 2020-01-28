@@ -8,6 +8,11 @@
 
 def init(module):
     module.name = ":motor-can:common"
+    module.description = """\
+## motor-can
+
+CAN communication protocol for the robot internal motor control between alpha-motor and micro-motor boards.
+"""
 
 def prepare(module, options):
 	module.depends(
