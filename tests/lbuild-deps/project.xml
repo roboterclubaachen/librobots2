@@ -6,8 +6,8 @@
 
   <options>
     <option name=":target">stm32f407vgt6</option>
-    <option name="modm:build:scons:info.git">Info+Status</option>
-    <option name="modm:build:scons:info.build">True</option>
+    <option name="modm:build:info.git">Info+Status</option>
+    <option name="modm:build:info.build">True</option>
   </options>
 
 <modules>
