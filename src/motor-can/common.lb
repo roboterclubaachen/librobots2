@@ -15,10 +15,10 @@ CAN communication protocol for the robot internal motor control between alpha-mo
 """
 
 def prepare(module, options):
-	module.depends(
-		"modm:io",
-	)
-	return True
+    module.depends(
+        "modm:io",
+    )
+    return True
 
 def build(env):
     env.outbasepath = "librobots2/src/motor-can"
