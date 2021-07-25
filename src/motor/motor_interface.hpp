@@ -19,7 +19,7 @@ public:
 	virtual ~MotorInterface() = default;
 
 	/// Set pwm value in range of -32767...32767
-	virtual void setPwm(int16_t pwm) = 0;
+	virtual void setSetpoint(int16_t pwm) = 0;
 
 	virtual void disable() = 0;
 

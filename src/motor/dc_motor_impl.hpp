@@ -30,7 +30,7 @@ DcMotor<MotorBridge>::~DcMotor()
 
 /// Set pwm value in range of -32767...32767
 template<typename MotorBridge>
-void DcMotor<MotorBridge>::setPwm(int16_t pwm)
+void DcMotor<MotorBridge>::setSetpoint(int16_t pwm)
 {
 	constexpr auto Pwm = PhaseConfig::Pwm;
 	constexpr auto Low = PhaseConfig::Low;

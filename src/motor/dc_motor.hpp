@@ -34,7 +34,7 @@ public:
 	DcMotor& operator=(DcMotor&&) = default;
 
 	/// Set pwm value in range of -32767...32767
-	void setPwm(int16_t pwm) override;
+	void setSetpoint(int16_t pwm) override;
 
 	void disable() override;
 

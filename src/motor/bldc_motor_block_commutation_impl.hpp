@@ -30,7 +30,7 @@ BldcMotorBlockCommutation<MotorBridge>::~BldcMotorBlockCommutation()
 }
 
 template<typename MotorBridge>
-void BldcMotorBlockCommutation<MotorBridge>::setPwm(int16_t pwm)
+void BldcMotorBlockCommutation<MotorBridge>::setSetpoint(int16_t pwm)
 {
 	// limit negative pwm at -32767, 32768 is not representable with int16_t
 	if(pwm < -std::numeric_limits<int16_t>::max()) {

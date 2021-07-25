@@ -27,7 +27,7 @@ public:
 
 	~MotorDisabled() { disableMotors(); }
 
-	inline void setPwm([[maybe_unused]] int16_t pwm) override {};
+	inline void setSetpoint([[maybe_unused]] int16_t pwm) override {};
 
 	inline void disable() override { disableMotors(); };
 
