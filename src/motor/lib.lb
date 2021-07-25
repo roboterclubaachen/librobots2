@@ -12,7 +12,6 @@ def init(module):
 
 def prepare(module, options):
     module.depends(
-        "modm:build:scons",
         "modm:architecture:atomic",
         "modm:platform:core",
     )

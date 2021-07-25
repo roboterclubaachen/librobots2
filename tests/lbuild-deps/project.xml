@@ -12,5 +12,6 @@
 
 <modules>
   <module>librobots2:**</module>
+  <module>modm:build:scons</module>
 </modules>
 </library>

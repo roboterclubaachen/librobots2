@@ -10,9 +10,6 @@ def init(module):
     module.name = ":motion:encoder"
 
 def prepare(module, options):
-    module.depends(
-        "modm:build:scons",
-    )
     return True
 
 def build(env):
