@@ -13,6 +13,8 @@ def init(module):
 def prepare(module, options):
     module.depends(
         "modm:architecture:atomic",
+        "modm:cmsis:dsp",
+        "modm:math:filter",
         "modm:platform:core",
     )
     return True
@@ -21,6 +23,8 @@ def build(env):
     env.outbasepath = "librobots2/src/librobots2/motor"
     env.copy("bldc_motor_block_commutation.hpp")
     env.copy("bldc_motor_block_commutation_impl.hpp")
+    env.copy("bldc_motor_foc.hpp")
+    env.copy("bldc_motor_foc_impl.hpp")
     env.copy("block_commutation.hpp")
     env.copy("block_commutation_impl.hpp")
     env.copy("block_commutation_private.hpp")
@@ -32,4 +36,5 @@ def build(env):
     env.copy("motor_bridge.cpp")
     env.copy("motor_disabled.hpp")
     env.copy("motor_interface.hpp")
+    env.copy("svm.hpp")
     env.copy("utility/polymorphic_storage.hpp")
