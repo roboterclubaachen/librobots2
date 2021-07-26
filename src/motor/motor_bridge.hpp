@@ -18,9 +18,9 @@ namespace librobots2::motor
 
 enum class Phase : uint_fast8_t
 {
-	Phase1 = 0,
-	Phase2 = 1,
-	Phase3 = 2
+	PhaseU = 0,
+	PhaseV = 1,
+	PhaseW = 2
 };
 
 enum class
@@ -29,7 +29,7 @@ PhaseConfig : uint_fast8_t
 	HiZ,
 	Pwm,
 	Low,
-	// High
+	High
 };
 
 struct BridgeConfig

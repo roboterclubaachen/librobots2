@@ -14,9 +14,9 @@ namespace librobots2::motor
 
 PhaseConfig BridgeConfig::get(Phase phase) const
 {
-	if(phase == Phase::Phase1) {
+	if(phase == Phase::PhaseU) {
 		return config[0];
-	} else if(phase == Phase::Phase2) {
+	} else if(phase == Phase::PhaseV) {
 		return config[1];
 	} else {
 		return config[2];
