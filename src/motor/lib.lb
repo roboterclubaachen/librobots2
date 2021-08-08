@@ -13,7 +13,7 @@ def init(module):
 def prepare(module, options):
     module.depends(
         "modm:architecture:atomic",
-        "modm:cmsis:dsp",
+        "modm:cmsis:dsp:controller",
         "modm:math:filter",
         "modm:platform:core",
     )
