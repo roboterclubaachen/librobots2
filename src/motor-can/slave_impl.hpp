@@ -14,6 +14,8 @@
 #include <limits>
 #include <modm/platform/can/can_2.hpp>
 
+using namespace std::chrono_literals;
+
 namespace motorCan {
 
 template < typename CAN_BUS, typename MotorBoard >
@@ -56,7 +58,7 @@ MotorCanSlave< CAN_BUS, MotorBoard >::initialize(uint8_t _boardId)
 	MODM_LOG_DEBUG << "[motorCan] Listening to CAN messages with IDsß 0x" << modm::hex << static_cast<uint8_t>(Configuration::base_id + boardId);
 	MODM_LOG_DEBUG << modm::ascii << " and 0x" << modm::hex << static_cast<uint8_t>(Configuration::sync_id) << modm::ascii << modm::endl;
 
-	aliveTimer.restart(0);
+	aliveTimer.restart(0ms);
 }
 
 // ----------------------------------------------------------------------------
@@ -142,7 +144,7 @@ MotorCanSlave< CAN_BUS, MotorBoard >::receive()
 				updateMotors();
 
 				// Valid frame received, motorCan master seems to be up
-				aliveTimer.restart(100);
+				aliveTimer.restart(100ms);
 			}
 		}
 	}

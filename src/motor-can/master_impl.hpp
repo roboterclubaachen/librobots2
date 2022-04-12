@@ -10,6 +10,8 @@
 #error "Do not include this file directly. Include master.hpp instead."
 #endif
 
+using namespace std::chrono_literals;
+
 namespace motorCan
 {
 
@@ -56,7 +58,7 @@ MotorCanMaster< CAN >::update()
 				dataRx[idx] = message.data;
 
 				// Valid frame received, iMotor seems to be up
-				aliveTimer[idx].restart(100);
+				aliveTimer[idx].restart(100ms);
 			}
 		}
 	}
