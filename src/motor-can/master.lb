@@ -19,7 +19,7 @@ def prepare(module, options):
     return True
 
 def build(env):
-    env.outbasepath = "librobots2/src/motor-can"
+    env.outbasepath = "librobots2/src/librobots2/motor-can"
     env.copy("motor.hpp")
     env.copy("motor_impl.hpp")
     env.copy("encoder.hpp")
