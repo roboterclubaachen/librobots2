@@ -47,10 +47,10 @@ MotorCanMaster< CAN >::update()
 		if (message.length == sizeof(DataRx)) {
 
 			// Check ID
-			// 0x20 to 0x2f are valid responses from MotorId 0 to 15.
+			// base_id_reply to (base_id_reply + BoardCount) are valid responses from MotorId 0 to 15.
 			if (
 					(message.identifier >= (Configuration::base_id_reply) &&
-					(message.identifier <  (Configuration::base_id_reply + (Configuration::MotorCount))))
+					(message.identifier <  (Configuration::base_id_reply + (Configuration::BoardCount))))
 				)
 			{
 				uint8_t idx = message.identifier - Configuration::base_id_reply;
