@@ -68,6 +68,13 @@ void
 MotorCanSlave< CAN_BUS, MotorBoard >::update()
 {
 	receive();
+	if (!aliveTimer.isExpired()) {
+		updateMotors();
+	}
+	else {
+		MotorBoard::disable(MotorBoard::Motor::M1);
+		MotorBoard::disable(MotorBoard::Motor::M2);
+	}
 }
 
 // ----------------------------------------------------------------------------
@@ -108,7 +115,7 @@ template < typename CAN_BUS, typename MotorBoard >
 void
 MotorCanSlave< CAN_BUS, MotorBoard >::receive()
 {
-	while (CAN_BUS::isMessageAvailable())
+	if (CAN_BUS::isMessageAvailable())
 	{
 		modm::can::Message message;
 		CAN_BUS::getMessage(message);
@@ -140,8 +147,6 @@ MotorCanSlave< CAN_BUS, MotorBoard >::receive()
 				MODM_LOG_DEBUG << "Motor data received. Message id " << message.identifier << modm::endl;
 
 				dataToMotor.updateFromMessageData(message.data);
-
-				updateMotors();
 
 				// Valid frame received, motorCan master seems to be up
 				aliveTimer.restart(100ms);
