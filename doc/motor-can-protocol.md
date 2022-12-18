@@ -30,3 +30,17 @@ This message is transmitted from the slave boards in response to the [sync messa
 | Identifier | Length | Data[0], Data[1]         | Data[2], Data[3]         | Data[4], Data[5]        | Data[6], Data[7]        |
 |------------|--------|--------------------------|--------------------------|-------------------------|-------------------------|
 | 0x80 + ID  | 8      | uint16_t Encoder Motor 1 | uint16_t Encoder Motor 2 | int16_t Current Motor 1 | int16_t Current Motor 2 |
+
+## Example Usage
+
+### Sending messages from a Linux Host
+
+```bash
+# Setup socketcan interface
+sudo ip link set can0 up type can bitrate 1000000
+# Enable socketcan interface
+sudo ip link set can0 up
+
+# Send a message
+cansend can0 012#0ccc0000ffff0000
+```
