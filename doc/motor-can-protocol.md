@@ -37,7 +37,7 @@ This message is transmitted from the slave boards in response to the [sync messa
 
 ```bash
 # Setup socketcan interface
-sudo ip link set can0 up type can bitrate 1000000
+sudo ip link set can0 type can bitrate 1000000
 # Enable socketcan interface
 sudo ip link set can0 up
 
