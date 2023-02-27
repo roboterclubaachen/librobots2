@@ -1,0 +1,56 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!--
+Copyright (c) 2016, Sascha Schade
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<!DOCTYPE rca SYSTEM "rca_packets.dtd">
+<rca version="1.0">
+<description>Enthaelt allgemeine Pakete, die ueberall verwendet werden.</description>
+
+<builtin name="int8_t"   size="1" />
+<builtin name="int16_t"  size="2" />
+<builtin name="int32_t"  size="4" />
+<builtin name="uint8_t"  size="1" />
+<builtin name="uint16_t" size="2" />
+<builtin name="uint32_t" size="4" />
+<builtin name="float"    size="4" />
+<builtin name="char"     size="1" />
+
+<typedef name="Bool" type="uint8_t">
+	<description>
+		On x86 systems the bool-type has 4 bytes and on AVRs it has 1 byte.
+		This type is defined to make it possible to send bools from everywhere.
+	</description>
+</typedef>
+
+<struct name="Position">
+	<element name="x" type="int16_t" unit="mm" />
+	<element name="y" type="int16_t" unit="mm" />
+</struct>
+
+<struct name="Orientation">
+	<element name="phi" type="float" unit="rad" />
+</struct>
+
+<struct name="Location">
+	<description>Lage = Position + Orientierung</description>
+	<element name="x"   type="int16_t" unit="mm"  />
+	<element name="y"   type="int16_t" unit="mm"  />
+	<element name="phi" type="float"   unit="rad" />
+</struct>
+
+<enum name="Team Colour" typed="strong">
+	<description>Team colour of our robots</description>
+
+	<element name="Undefined" value="0">
+		<description>Team colour is undefined</description>
+	</element>
+	<element name="Negative Y" value="1"/>
+	<element name="Positive Y" value="2"/>
+</enum>
+
+</rca>
