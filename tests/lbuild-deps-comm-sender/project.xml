@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<library>
+  <repositories>
+    <repository><path>../../repo.lb</path></repository>
+    <repository><path>../../../modm/repo.lb</path></repository>
+  </repositories>
+
+  <options>
+    <option name="modm:target">stm32f407vgt6</option>
+    <option name="modm:build:info.git">Info+Status</option>
+    <option name="modm:build:info.build">True</option>
+    <option name="modm::xpcc:generator:source">../../../modm/examples/xpcc/xml/communication.xml</option>
+    <option name="modm::xpcc:generator:container">sender</option>
+  </options>
+
+<modules>
+  <module>librobots2:communication</module>
+  <module>modm:build:scons</module>
+</modules>
+</library>
