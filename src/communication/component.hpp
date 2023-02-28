@@ -13,7 +13,7 @@
 
 #include <modm/communication/xpcc/abstract_component.hpp>
 
-#include "communication/packets.hpp"
+#include "packets.hpp"
 
 namespace robot
 {
