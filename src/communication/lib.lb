@@ -1,0 +1,25 @@
+#!/usr/bin/env python3
+#
+# Copyright (c) 2018, Niklas Hauser
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+def init(module):
+    module.name = ":communication"
+
+def prepare(module, options):
+    module.depends(
+        "modm:communication:xpcc:generator",
+        "modm:debug",
+        "modm:math:geometry",
+        "modm:platform:core",
+    )
+    return True
+
+def build(env):
+    env.outbasepath = "librobots2/src/librobots2/communication"
+    env.copy("component.hpp")
+    env.copy("component.cpp")
+    env.copy("conversion.hpp")
