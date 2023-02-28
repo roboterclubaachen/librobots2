@@ -11,7 +11,9 @@
   </options>
 
 <modules>
-  <module>librobots2:**</module>
+  <module>librobots2:motion</module>
+  <module>librobots2:motor</module>
+  <module>librobots2:motor-can:**</module>
   <module>modm:build:scons</module>
 </modules>
 </library>
