@@ -1,4 +1,4 @@
-image: ghcr.io/modm-ext/modm-build-cortex-m:latest
+image: ghcr.io/modm-ext/modm-build-cortex-m:2022-09-27
 
 variables:
   GIT_SUBMODULE_STRATEGY: recursive
