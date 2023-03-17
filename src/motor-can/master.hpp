@@ -135,6 +135,8 @@ public:
 private:
 	static inline std::array<modm::ShortTimeout, Configuration::BoardCount>
 	aliveTimer;
+
+	static inline CAN can{};
 };
 
 } // namespace motorCan

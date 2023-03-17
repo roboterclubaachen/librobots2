@@ -28,7 +28,7 @@ MotorCanMaster< CAN >::sendSync()
 	modm::can::Message msg(Configuration::sync_id, Configuration::sync_length);
 	msg.setExtended(false);
 
-	CAN::sendMessage(msg);
+	can.sendMessage(msg);
 }
 
 template < typename CAN >
@@ -38,10 +38,10 @@ MotorCanMaster< CAN >::update()
 	modm::atomic::Lock lock;
 
     // Process all waiting CAN messages
-	while (CAN::isMessageAvailable())
+	while (can.isMessageAvailable())
 	{
 		modm::can::Message message;
-		CAN::getMessage(message);
+		can.getMessage(message);
 
 		// Check length
 		if (message.length == sizeof(DataRx)) {
@@ -76,7 +76,7 @@ MotorCanMaster< CAN >::transmit()
 		msg.setExtended(false);
 		dataTx[idx].toMessageData(msg.data);
 
-		bool ret = CAN::sendMessage(msg);
+		bool ret = can.sendMessage(msg);
 		if (ret == false) {
 	//			LedRed::set();
 		}
