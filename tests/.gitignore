@@ -1,6 +1,8 @@
 # generated paths and files by lbuild
 build/
+generated/
 librobots2/
 modm/
 project.xml.log
 SConstruct
+.vscode/

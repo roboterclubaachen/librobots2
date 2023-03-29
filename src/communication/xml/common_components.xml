@@ -1,0 +1,44 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!--
+Copyright (c) 2016, Sascha Schade
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<!DOCTYPE rca SYSTEM "rca_components.dtd">
+<rca version="1.0">
+<!-- Elementary Datatypes -->
+<include>common_packets.xml</include>
+
+<component name="component">
+	<description>Basis fuer alle Komponenten.
+	Legt Funktionen und Events fest die alle Komponenten besitzen muessen.
+	</description>
+
+	<actions>
+		<action name="ping" id="0">
+			<description>Ping-Nachricht.
+			Kann verwendet werden um zu ueberpruefen ob eine Komponente vorhanden bzw.
+			ansprechbar ist.</description>
+		</action>
+
+		<action name="awake" id="2">
+			<description>Some components are needing some calibration/ initialisation before they can be used.
+						 Please ensure that the team colour is set by some strategy action before components depending during awakening on it are awaked.
+			</description>
+		</action>
+	</actions>
+</component>
+
+<component name="pc" id="0xf0">
+	<description>PC generated messages will have this as source </description>
+</component>
+
+<component name="broadcast" id="0x00">
+	<description> For debugging in the PC it is useful to have for every can message (also event) a receiver and transmitter.
+	So this is the Component which is the formal receiver of events.</description>
+</component>
+
+</rca>

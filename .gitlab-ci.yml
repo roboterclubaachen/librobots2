@@ -18,6 +18,5 @@ compile-tests:
     - lbuild --version
     - lbuild -h | head -n1
     #
-    - cd tests/lbuild-deps
-    - lbuild build
-    - scons
+    - cd tests/
+    - for i in ./*/project.xml; do pushd $(dirname $i); lbuild build; scons; popd; done
