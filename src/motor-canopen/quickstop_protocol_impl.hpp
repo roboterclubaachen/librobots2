@@ -2,12 +2,12 @@
 #error "Do not include this file directly, use quickstop_protocol.hpp instead"
 #endif
 
-template <size_t id, typename VelocityProtocol>
+template <size_t id>
 template <typename Device, typename MessageCallback>
-bool QuickstopProtocol<id, VelocityProtocol>::update(MotorState &state,
-                                                     MessageCallback &&) {
+bool QuickstopProtocol<id>::update(MotorState &state, MessageCallback &&) {
   if (state.status_.state() == modm_canopen::cia402::State::QuickStopActive) {
-    VelocityProtocol::doQuickStopUpdate(quickStopDeceleration_, state);
+    state.outputPWM_ = VelocityControl<id>::doDecelerationUpdate(
+        quickStopDeceleration_, state);
     Device::setValueChanged(VelocityObjects::VelocityDemandValue);
     Device::setValueChanged(VelocityObjects::VelocityError);
     state.status_
@@ -21,9 +21,9 @@ bool QuickstopProtocol<id, VelocityProtocol>::update(MotorState &state,
   return true;
 }
 
-template <size_t id, typename VelocityProtocol>
+template <size_t id>
 template <typename ObjectDictionary, const MotorState &state>
-constexpr void QuickstopProtocol<id, VelocityProtocol>::registerHandlers(
+constexpr void QuickstopProtocol<id>::registerHandlers(
     modm_canopen::HandlerMap<ObjectDictionary> &map) {
   using modm_canopen::SdoErrorCode;
   map.template setReadHandler<QuickStopObjects::QuickStopDeceleration>(+[]() {

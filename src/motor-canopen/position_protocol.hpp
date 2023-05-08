@@ -27,7 +27,7 @@ struct PositionObjects {
                                                                  4}; // Custom
 };
 
-template <size_t id, typename VelocityProtocol> class PositionProtocol {
+template <size_t id> class PositionProtocol {
 public:
   static inline Pid::Parameter positionPidParameters_{
       1.0f, 0.0f, 0.0f, 1000000.0f, std::numeric_limits<int16_t>::max()};

@@ -5,10 +5,9 @@
 #include "velocity_protocol.hpp"
 #include <modm/debug/logger.hpp>
 
-template <size_t id, typename VelocityProtocol>
+template <size_t id>
 template <typename Device, typename MessageCallback>
-bool PositionProtocol<id, VelocityProtocol>::update(MotorState &state,
-                                                    MessageCallback &&) {
+bool PositionProtocol<id>::update(MotorState &state, MessageCallback &&) {
   if (state.control_.isSet<CommandBits::NewSetPoint>()) {
     nextPosition_ = receivedPosition_;
     nextPositionIsNew_ = true;
@@ -34,7 +33,7 @@ bool PositionProtocol<id, VelocityProtocol>::update(MotorState &state,
 
   positionPid_.update(positionError_);
   state.outputPWM_ =
-      VelocityProtocol::doPositionUpdate(positionPid_.getValue(), state);
+      VelocityControl<id>::doVelocityUpdate(positionPid_.getValue(), state);
 
   Device::setValueChanged(VelocityObjects::VelocityError);
   Device::setValueChanged(VelocityObjects::VelocityDemandValue);
@@ -51,9 +50,9 @@ bool PositionProtocol<id, VelocityProtocol>::update(MotorState &state,
   return true;
 }
 
-template <size_t id, typename VelocityProtocol>
+template <size_t id>
 template <typename ObjectDictionary, const MotorState &state>
-constexpr void PositionProtocol<id, VelocityProtocol>::registerHandlers(
+constexpr void PositionProtocol<id>::registerHandlers(
     modm_canopen::HandlerMap<ObjectDictionary> &map) {
   using modm_canopen::SdoErrorCode;
 

@@ -7,13 +7,14 @@
 #include <modm-canopen/object_dictionary.hpp>
 
 #include "motor_state.hpp"
+#include "velocity_control.hpp"
 
 struct QuickStopObjects {
   static constexpr modm_canopen::Address QuickStopDeceleration{0x6085,
                                                                0}; // User units
 };
 
-template <size_t id, typename VelocityProtocol> class QuickstopProtocol {
+template <size_t id> class QuickstopProtocol {
 public:
   static inline int32_t quickStopDeceleration_{10000};
 
