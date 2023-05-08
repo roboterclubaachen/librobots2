@@ -38,12 +38,5 @@ public:
   registerHandlers(modm_canopen::HandlerMap<ObjectDictionary> &map);
 };
 
-template <size_t id>
-using MotorControl_t =
-    MotorControl<id, IdentityProtocol<id>, HeartbeatProtocol<id>,
-                 PWMProtocol<id>, VelocityProtocol<id>,
-                 PositionProtocol<id, VelocityProtocol<id>>,
-                 QuickstopProtocol<id, VelocityProtocol<id>>>;
-
 #include "motor_control_impl.hpp"
 #endif
