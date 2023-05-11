@@ -15,12 +15,17 @@ using namespace std::literals;
 
 struct HeartbeatObjects {
   static constexpr modm_canopen::Address TimeBetweenHeartbeats{0x1017, 0};
+  static constexpr modm_canopen::Address MasterHeartbeatTimeout{0x2009, 0};
 };
 
 template <size_t id> class HeartbeatProtocol {
 public:
+  static constexpr auto masterID = 0;
   static inline auto timeBetweenHeatbeats{200ms};
   static inline modm::PeriodicTimer heartBeatTimer_{timeBetweenHeatbeats / 2};
+  static inline auto masterHeartbeatTimeout{200ms};
+  static inline bool receivedMasterHeartbeat{false};
+  static inline modm::Clock::time_point lastMasterHeartbeat{};
 
 public:
   static bool applicable(const MotorState &) { return true; }
@@ -31,6 +36,10 @@ public:
   template <typename ObjectDictionary, const MotorState &state>
   static constexpr void
   registerHandlers(modm_canopen::HandlerMap<ObjectDictionary> &map);
+
+  template <typename Device, typename MessageCallback>
+  static void processMessage(MotorState &, const modm::can::Message &,
+                             MessageCallback &&);
 
 private:
   static inline void makeHeartbeatMSG(uint8_t canId, modm::can::Message &msg);

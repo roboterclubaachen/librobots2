@@ -28,6 +28,15 @@ bool MotorControl<id, Modes...>::updateMode(MessageCallback &&cb) {
 
 template <size_t id, typename... Modes>
 template <typename Device, typename MessageCallback>
+void MotorControl<id, Modes...>::processMessage(
+    const modm::can::Message &message, MessageCallback &&cb) {
+  (Modes{}.template processMessage<Device, MessageCallback>(
+       state_, message, std::forward<MessageCallback>(cb)),
+   ...);
+}
+
+template <size_t id, typename... Modes>
+template <typename Device, typename MessageCallback>
 bool MotorControl<id, Modes...>::update(MessageCallback &&cb) {
   auto now = modm::chrono::micro_clock::now();
   state_.updateTime_.update((now - state_.lastUpdate_).count());
@@ -36,7 +45,9 @@ bool MotorControl<id, Modes...>::update(MessageCallback &&cb) {
 
   const auto newVelocity_ = state_.actualPosition_ - state_.lastPosition_;
   state_.lastPosition_ = state_.actualPosition_;
-  state_.actualVelocity_.update(newVelocity_ * 1024); // Increase velocity resolution for better regulation
+  state_.actualVelocity_.update(
+      newVelocity_ *
+      1024); // Increase velocity resolution for better regulation
 
   Device::setValueChanged(StateObjects::PositionInternalValue);
   Device::setValueChanged(StateObjects::PositionActualValue);

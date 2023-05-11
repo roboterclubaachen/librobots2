@@ -27,6 +27,10 @@ public:
   template <typename Device, typename MessageCallback>
   static bool update(MessageCallback &&cb);
 
+  template <typename Device, typename MessageCallback>
+  static void processMessage(const modm::can::Message &message,
+                             MessageCallback &&cb);
+
   static inline void setActualPosition(int32_t position) {
     state_.actualPosition_ = position;
   }

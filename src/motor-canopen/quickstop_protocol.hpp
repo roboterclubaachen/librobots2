@@ -27,6 +27,10 @@ public:
   template <typename ObjectDictionary, const MotorState &state>
   static constexpr void
   registerHandlers(modm_canopen::HandlerMap<ObjectDictionary> &map);
+
+  template <typename Device, typename MessageCallback>
+  static void processMessage(MotorState &, const modm::can::Message &,
+                             MessageCallback &&) {}
 };
 
 #include "quickstop_protocol_impl.hpp"
