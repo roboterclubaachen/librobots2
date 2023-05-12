@@ -23,25 +23,22 @@ bool HeartbeatProtocol<id>::update(MotorState &state, MessageCallback &&cb) {
     cb(message);
   }
   auto now = modm::Clock::now();
-  if (!receivedMasterHeartbeat ||
+  if (receivedMasterHeartbeat &&
       now - lastMasterHeartbeat > masterHeartbeatTimeout) {
-    if (state.mode_ != OperatingMode::Disabled ||
-        state.status_.state() != State::SwitchOnDisabled) {
-      state.mode_ = OperatingMode::Disabled;
-      // TODO implement this in statemachine
-      auto stateWord_ = state.status_.status();
-      constexpr uint16_t disableVoltageMask_ = 0b0100'1111;
-      constexpr uint16_t disableVoltageValue_ = 0b0100'0000;
-      stateWord_ = (stateWord_ & ~disableVoltageMask_) |
-                   (disableVoltageValue_ & disableVoltageMask_);
-      state.status_.set(stateWord_);
-      Device::setValueChanged(StateObjects::ModeOfOperation);
-      Device::setValueChanged(StateObjects::StatusWord);
-      if (receivedMasterHeartbeat) {
-        MODM_LOG_WARNING << "Master heartbeat timed out!" << modm::endl;
-        receivedMasterHeartbeat = false;
-      }
-    }
+    MODM_LOG_WARNING << "Master heartbeat timed out!" << modm::endl;
+
+    state.mode_ = OperatingMode::Disabled;
+    // TODO implement this in statemachine
+    auto stateWord_ = state.status_.status();
+    constexpr uint16_t disableVoltageMask_ = 0b0100'1111;
+    constexpr uint16_t disableVoltageValue_ = 0b0100'0000;
+    stateWord_ = (stateWord_ & ~disableVoltageMask_) |
+                 (disableVoltageValue_ & disableVoltageMask_);
+    state.status_.set(stateWord_);
+    Device::setValueChanged(StateObjects::ModeOfOperation);
+    Device::setValueChanged(StateObjects::StatusWord);
+
+    receivedMasterHeartbeat = false;
   }
   return true;
 }
