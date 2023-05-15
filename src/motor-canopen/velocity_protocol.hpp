@@ -15,6 +15,7 @@ public:
   static inline int32_t commandedVelocity_{};
 
   static bool applicable(const MotorState &state) {
+    VelocityControl<0>::resetIfApplicable(state);
     return state.enableMotor_ && state.mode_ == OperatingMode::Velocity &&
            state.status_.state() ==
                modm_canopen::cia402::State::OperationEnabled;
