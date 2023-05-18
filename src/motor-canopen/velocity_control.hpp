@@ -1,5 +1,6 @@
 #ifndef VELOCITY_CONTROL_HPP
 #define VELOCITY_CONTROL_HPP
+#include "current_control.hpp"
 #include <cstdlib>
 #include <modm/math/filter/pid.hpp>
 
@@ -59,10 +60,7 @@ int16_t VelocityControl<id>::doVelocityUpdate(int32_t commandedVelocity,
     velocityError_ = commandedVelocity - state.actualVelocity_.getValue();
     velocityPid_.update(velocityError_,
                         state.outputPWM_ > profileAcceleration_);
-    return (int16_t)std::clamp((int32_t)velocityPid_.getValue(),
-                               -profileAcceleration_, profileAcceleration_);
-  } else {
-    return 0;
+    return CurrentControl<id>::update(velocityPid_.getValue(), state);
   }
 }
 
@@ -72,8 +70,9 @@ int16_t VelocityControl<id>::doDecelerationUpdate(int32_t commandedDeceleration,
   lastCommandedVel_ = 0;
   velocityError_ = -state.actualVelocity_.getValue();
   velocityPid_.update(velocityError_, state.outputPWM_ > commandedDeceleration);
-  return (int16_t)std::clamp((int32_t)velocityPid_.getValue(),
-                             -commandedDeceleration, commandedDeceleration);
+  return (int16_t)std::clamp(
+      (int32_t)CurrentControl<id>::update(velocityPid_.getValue(), state),
+      -commandedDeceleration, commandedDeceleration);
 }
 
 template <size_t id>

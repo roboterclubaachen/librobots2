@@ -27,6 +27,9 @@ struct StateObjects {
   static constexpr modm_canopen::Address VelocityActualValue{0x606C,
                                                              0}; // User units
 
+  static constexpr modm_canopen::Address ActualCurrent{0x2013, 0}; // Custom
+  static constexpr modm_canopen::Address MaxCurrent{0x2011, 0};    // Custom
+
   static constexpr modm_canopen::Address OutputPWM{0x2003, 0}; // Custom
   static constexpr modm_canopen::Address Reset{0x2007, 0};     // Set 1/0
 
@@ -50,6 +53,9 @@ struct MotorState {
 
   int32_t actualPosition_{};
   int32_t lastPosition_{};
+
+  float actualCurrent_{};
+  float maxCurrent_{2.0f};
 
   modm::filter::MovingAverage<int32_t, 16> actualVelocity_{};
 

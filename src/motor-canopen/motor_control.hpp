@@ -35,7 +35,13 @@ public:
     state_.actualPosition_ = position;
   }
 
+  static inline void setOrientedCurrent(float current) {
+    state_.actualCurrent_ = current;
+  }
+
   static inline int16_t outputPWM() { return state_.outputPWM_; }
+
+  static inline float maxCurrent() { return state_.maxCurrent_; }
 
   template <typename ObjectDictionary>
   constexpr void

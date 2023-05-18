@@ -25,6 +25,8 @@ def build(env):
     env.copy("bldc_motor_block_commutation_impl.hpp")
     env.copy("bldc_motor_foc.hpp")
     env.copy("bldc_motor_foc_impl.hpp")
+    env.copy("bldc_motor_current.hpp")
+    env.copy("bldc_motor_current_impl.hpp")
     env.copy("block_commutation.hpp")
     env.copy("block_commutation_impl.hpp")
     env.copy("block_commutation_private.hpp")

@@ -143,6 +143,9 @@ constexpr void MotorControl<id, Modes...>::registerHandlers(
   map.template setReadHandler<StateObjects::OutputPWM>(
       +[]() { return state_.outputPWM_; });
 
+  map.template setReadHandler<StateObjects::ActualCurrent>(
+      +[]() { return state_.actualCurrent_; });
+
   map.template setReadHandler<StateObjects::PositionFactorNumerator>(
       +[]() { return state_.scalingFactors_.position.numerator; });
 
@@ -202,6 +205,13 @@ constexpr void MotorControl<id, Modes...>::registerHandlers(
 
   map.template setWriteHandler<StateObjects::Polarity>(+[](uint8_t value) {
     state_.scalingFactors_.setPolarity(value);
+    return SdoErrorCode::NoError;
+  });
+  map.template setReadHandler<StateObjects::MaxCurrent>(
+      +[]() { return state_.maxCurrent_; });
+
+  map.template setWriteHandler<StateObjects::MaxCurrent>(+[](float value) {
+    state_.maxCurrent_ = value;
     return SdoErrorCode::NoError;
   });
 
