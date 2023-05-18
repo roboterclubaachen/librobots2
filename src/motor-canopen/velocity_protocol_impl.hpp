@@ -3,6 +3,7 @@
 #endif
 
 #include <algorithm>
+#include <cmath>
 #include <modm/debug/logger.hpp>
 
 using CommandBits = modm_canopen::cia402::CommandBits;

@@ -38,11 +38,21 @@ public:
                                              const MotorState &state);
 
   static inline void resetIfApplicable(const MotorState &state);
+
+private:
+  static inline int32_t lastCommandedVel_{0};
 };
 
 template <size_t id>
 int16_t VelocityControl<id>::doVelocityUpdate(int32_t commandedVelocity,
                                               const MotorState &state) {
+
+  if (std::signbit(lastCommandedVel_) != std::signbit(commandedVelocity) &&
+      (commandedVelocity != 0 && lastCommandedVel_ != 0)) {
+    velocityPid_.reset();
+  }
+  lastCommandedVel_ = commandedVelocity;
+
   velocityError_ = commandedVelocity - state.actualVelocity_.getValue();
   velocityPid_.update(velocityError_, state.outputPWM_ > profileAcceleration_);
   return (int16_t)std::clamp((int32_t)velocityPid_.getValue(),
@@ -52,6 +62,7 @@ int16_t VelocityControl<id>::doVelocityUpdate(int32_t commandedVelocity,
 template <size_t id>
 int16_t VelocityControl<id>::doDecelerationUpdate(int32_t commandedDeceleration,
                                                   const MotorState &state) {
+  lastCommandedVel_ = 0;
   velocityError_ = -state.actualVelocity_.getValue();
   velocityPid_.update(velocityError_, state.outputPWM_ > commandedDeceleration);
   return (int16_t)std::clamp((int32_t)velocityPid_.getValue(),
