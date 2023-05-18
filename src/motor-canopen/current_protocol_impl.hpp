@@ -9,7 +9,6 @@ using OperatingMode = modm_canopen::cia402::OperatingMode;
 template <size_t id>
 template <typename Device, typename MessageCallback>
 bool CurrentProtocol<id>::update(MotorState &state, MessageCallback &&) {
-
   if (commandedCurrent_ == 0.0f) {
     state.outputPWM_ = 0;
   } else {
@@ -28,11 +27,13 @@ constexpr void CurrentProtocol<id>::registerHandlers(
   map.template setReadHandler<CurrentObjects::CommandedCurrent>(
       +[]() { return commandedCurrent_; });
 
-  map.template setWriteHandler<CurrentObjects::CommandedCurrent>(
-      +[](float value) {
-        commandedCurrent_ = value;
-        return SdoErrorCode::NoError;
-      });
+  map.template setReadHandler<CurrentObjects::TargetCurrent>(
+      +[]() { return targetCurrent_; });
+
+  map.template setWriteHandler<CurrentObjects::TargetCurrent>(+[](float value) {
+    targetCurrent_ = value;
+    return SdoErrorCode::NoError;
+  });
 
   map.template setReadHandler<CurrentObjects::CurrentError>(
       +[]() { return CurrentControl<id>::currentError_; });

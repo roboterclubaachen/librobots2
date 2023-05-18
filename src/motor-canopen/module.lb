@@ -24,6 +24,7 @@ def prepare(module, options):
         "modm-canopen:device",
         "modm-canopen:device:cia402",
         "modm:math:filter",
+        "modm:container"
     )
     return True
 

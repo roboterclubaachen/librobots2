@@ -215,5 +215,13 @@ constexpr void MotorControl<id, Modes...>::registerHandlers(
     return SdoErrorCode::NoError;
   });
 
+  map.template setReadHandler<StateObjects::MaxCharge>(
+      +[]() { return state_.maxCharge_; });
+
+  map.template setWriteHandler<StateObjects::MaxCharge>(+[](float value) {
+    state_.maxCharge_ = value;
+    return SdoErrorCode::NoError;
+  });
+
   (Modes::template registerHandlers<ObjectDictionary, state_>(map), ...);
 }

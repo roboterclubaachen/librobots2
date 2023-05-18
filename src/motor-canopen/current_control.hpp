@@ -2,13 +2,16 @@
 #define CURRENT_CONTROL_HPP
 #include "motor_state.hpp"
 #include <cstdlib>
+#include <modm/container/deque.hpp>
 #include <modm/math/filter/pid.hpp>
+#include <modm/processing/timer.hpp>
 
 using Pid = modm::Pid<float>;
 
 struct CurrentObjects {
-  static constexpr modm_canopen::Address CommandedCurrent{0x2014, 0}; // Custom
+  static constexpr modm_canopen::Address TargetCurrent{0x2014, 0};    // Custom
   static constexpr modm_canopen::Address CurrentError{0x2012, 0};     // Custom
+  static constexpr modm_canopen::Address CommandedCurrent{0x2016, 0}; // Custom
 
   static constexpr modm_canopen::Address CurrentPID_kP{0x2010, 1}; // Custom
   static constexpr modm_canopen::Address CurrentPID_kI{0x2010, 2}; // Custom
@@ -23,7 +26,12 @@ public:
       1.0f, 0.0f, 0.0f, 10000000.0f, std::numeric_limits<int16_t>::max()};
   static inline Pid currentPid_;
   static inline float currentError_{};
+  static inline float commandedCurrent_{};
+  static inline modm::Clock::time_point lastExecute_{modm::Clock::now()};
+  static inline modm::BoundedDeque<std::pair<float, uint16_t>, 256>
+      currentValues_{};
 
+  static float getCharge();
   static int16_t update(float commandedCurrent, const MotorState &state);
 
   static void resetIfApplicable(const MotorState &state);

@@ -29,6 +29,7 @@ struct StateObjects {
 
   static constexpr modm_canopen::Address ActualCurrent{0x2013, 0}; // Custom
   static constexpr modm_canopen::Address MaxCurrent{0x2011, 0};    // Custom
+  static constexpr modm_canopen::Address MaxCharge{0x2015, 0};     // Custom
 
   static constexpr modm_canopen::Address OutputPWM{0x2003, 0}; // Custom
   static constexpr modm_canopen::Address Reset{0x2007, 0};     // Set 1/0
