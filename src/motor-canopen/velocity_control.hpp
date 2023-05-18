@@ -52,11 +52,18 @@ int16_t VelocityControl<id>::doVelocityUpdate(int32_t commandedVelocity,
     velocityPid_.reset();
   }
   lastCommandedVel_ = commandedVelocity;
+  if (std::signbit(commandedVelocity) ==
+          std::signbit(state.actualVelocity_.getValue()) ||
+      state.actualVelocity_.getValue() == 0) {
 
-  velocityError_ = commandedVelocity - state.actualVelocity_.getValue();
-  velocityPid_.update(velocityError_, state.outputPWM_ > profileAcceleration_);
-  return (int16_t)std::clamp((int32_t)velocityPid_.getValue(),
-                             -profileAcceleration_, profileAcceleration_);
+    velocityError_ = commandedVelocity - state.actualVelocity_.getValue();
+    velocityPid_.update(velocityError_,
+                        state.outputPWM_ > profileAcceleration_);
+    return (int16_t)std::clamp((int32_t)velocityPid_.getValue(),
+                               -profileAcceleration_, profileAcceleration_);
+  } else {
+    return 0;
+  }
 }
 
 template <size_t id>
