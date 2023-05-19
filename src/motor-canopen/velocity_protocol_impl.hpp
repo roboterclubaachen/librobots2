@@ -24,7 +24,7 @@ bool VelocityProtocol<id>::update(MotorState &state, MessageCallback &&) {
     commandedVelocity_ = 0;
   }
 
-  if (commandedVelocity_ == 0 && state.actualVelocity_.getValue() == 0) {
+  if (commandedVelocity_ == 0) {
     state.outputPWM_ = 0;
   } else {
     state.outputPWM_ =
