@@ -32,9 +32,11 @@ public:
 
   static inline int32_t velocityError_{};
 
+  template <typename Device>
   static inline int16_t doVelocityUpdate(int32_t commandedVelocity,
                                          const MotorState &state);
 
+  template <typename Device>
   static inline int16_t doDecelerationUpdate(int32_t commandedDeceleration,
                                              const MotorState &state);
 
@@ -45,6 +47,7 @@ private:
 };
 
 template <size_t id>
+template <typename Device>
 int16_t VelocityControl<id>::doVelocityUpdate(int32_t commandedVelocity,
                                               const MotorState &state) {
 
@@ -60,18 +63,24 @@ int16_t VelocityControl<id>::doVelocityUpdate(int32_t commandedVelocity,
     velocityError_ = commandedVelocity - state.actualVelocity_.getValue();
     velocityPid_.update(velocityError_,
                         state.outputPWM_ > profileAcceleration_);
-    return CurrentControl<id>::update(velocityPid_.getValue(), state);
+    Device::setValueChanged(VelocityObjects::VelocityError);
+    return CurrentControl<id>::template update<Device>(velocityPid_.getValue(),
+                                                       state);
   }
+  return 0;
 }
 
 template <size_t id>
+template <typename Device>
 int16_t VelocityControl<id>::doDecelerationUpdate(int32_t commandedDeceleration,
                                                   const MotorState &state) {
   lastCommandedVel_ = 0;
   velocityError_ = -state.actualVelocity_.getValue();
   velocityPid_.update(velocityError_, state.outputPWM_ > commandedDeceleration);
+  Device::setValueChanged(VelocityObjects::VelocityError);
   return (int16_t)std::clamp(
-      (int32_t)CurrentControl<id>::update(velocityPid_.getValue(), state),
+      (int32_t)CurrentControl<id>::template update<Device>(
+          velocityPid_.getValue(), state),
       -commandedDeceleration, commandedDeceleration);
 }
 

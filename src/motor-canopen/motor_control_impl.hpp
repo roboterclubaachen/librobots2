@@ -52,6 +52,7 @@ bool MotorControl<id, Modes...>::update(MessageCallback &&cb) {
   Device::setValueChanged(StateObjects::PositionInternalValue);
   Device::setValueChanged(StateObjects::PositionActualValue);
   Device::setValueChanged(StateObjects::VelocityActualValue);
+  Device::setValueChanged(StateObjects::ActualCurrent);
 
   bool value = false;
   if (state_.status_.state() != modm_canopen::cia402::State::OperationEnabled ||
@@ -99,7 +100,8 @@ constexpr void MotorControl<id, Modes...>::registerHandlers(
         const bool valid = (value == int8_t(OperatingMode::Disabled)) ||
                            (value == int8_t(OperatingMode::Voltage)) ||
                            (value == int8_t(OperatingMode::Velocity)) ||
-                           (value == int8_t(OperatingMode::Position));
+                           (value == int8_t(OperatingMode::Position)) ||
+                           (value == int8_t(OperatingMode::Current));
 
         if (valid) {
           auto newMode = (static_cast<OperatingMode>(value));

@@ -32,6 +32,8 @@ public:
       currentValues_{};
 
   static float getCharge();
+
+  template <typename Device>
   static int16_t update(float commandedCurrent, const MotorState &state);
 
   static void resetIfApplicable(const MotorState &state);

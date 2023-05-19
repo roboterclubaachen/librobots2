@@ -1,8 +1,10 @@
 #ifndef CURRENT_CONTROL_HPP
 #error "Do not include this file directly, use current_control.hpp instead"
 #endif
+#include <modm/debug/logger.hpp>
 
 template <size_t id>
+template <typename Device>
 int16_t CurrentControl<id>::update(float commandedCurrent,
                                    const MotorState &state) {
   const auto now = modm::Clock::now();
@@ -22,7 +24,9 @@ int16_t CurrentControl<id>::update(float commandedCurrent,
   currentError_ = commandedCurrent_ - state.actualCurrent_;
   currentPid_.update(currentError_);
 
-  return (int16_t)currentPid_.getValue();
+  Device::setValueChanged(CurrentObjects::CurrentError);
+  Device::setValueChanged(CurrentObjects::CommandedCurrent);
+  return (int16_t)(currentPid_.getValue() * 1.0f);
 }
 
 template <size_t id>

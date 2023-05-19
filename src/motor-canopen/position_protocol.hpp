@@ -45,7 +45,7 @@ public:
 public:
   static bool applicable(const MotorState &state) {
     auto value =
-        state.enableMotor_ && state.mode_ == OperatingMode::Position &&
+        state.mode_ == OperatingMode::Position &&
         state.status_.state() == modm_canopen::cia402::State::OperationEnabled;
     if (!value) {
       positionPid_.reset();

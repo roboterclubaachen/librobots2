@@ -27,8 +27,8 @@ bool VelocityProtocol<id>::update(MotorState &state, MessageCallback &&) {
   if (commandedVelocity_ == 0 && state.actualVelocity_.getValue() == 0) {
     state.outputPWM_ = 0;
   } else {
-    state.outputPWM_ =
-        VelocityControl<id>::doVelocityUpdate(commandedVelocity_, state);
+    state.outputPWM_ = VelocityControl<id>::template doVelocityUpdate<Device>(
+        commandedVelocity_, state);
   }
 
   state.status_.setBit<StatusBits::TargetReached>(

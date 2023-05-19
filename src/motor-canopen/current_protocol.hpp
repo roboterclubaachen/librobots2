@@ -11,11 +11,11 @@
 
 template <size_t id> class CurrentProtocol {
 public:
-  static inline float commandedCurrent_{};
+  static inline float targetCurrent_{};
 
   static bool applicable(const MotorState &state) {
     CurrentControl<0>::resetIfApplicable(state);
-    return state.enableMotor_ && state.mode_ == OperatingMode::Current &&
+    return state.mode_ == OperatingMode::Current &&
            state.status_.state() ==
                modm_canopen::cia402::State::OperationEnabled;
   }

@@ -44,7 +44,7 @@ struct StateObjects {
 };
 
 struct MotorState {
-  OperatingMode mode_{OperatingMode::Voltage};
+  OperatingMode mode_{OperatingMode::Disabled};
   StateMachine status_{modm_canopen::cia402::State::SwitchOnDisabled};
   ControlWord control_{0};
   Factors scalingFactors_{};
@@ -57,6 +57,7 @@ struct MotorState {
 
   float actualCurrent_{};
   float maxCurrent_{2.0f};
+  float maxCharge_{60};
 
   modm::filter::MovingAverage<int32_t, 16> actualVelocity_{};
 

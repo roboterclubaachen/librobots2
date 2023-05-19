@@ -19,7 +19,7 @@ public:
 
 public:
   static bool applicable(const MotorState &state) {
-    return state.enableMotor_ && state.mode_ == OperatingMode::Voltage &&
+    return state.mode_ == OperatingMode::Voltage &&
            state.status_.state() ==
                modm_canopen::cia402::State::OperationEnabled;
   }

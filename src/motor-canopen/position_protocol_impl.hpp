@@ -32,8 +32,8 @@ bool PositionProtocol<id>::update(MotorState &state, MessageCallback &&) {
   Device::setValueChanged(PositionObjects::FollowingErrorActualValue);
 
   positionPid_.update(positionError_);
-  state.outputPWM_ =
-      VelocityControl<id>::doVelocityUpdate(positionPid_.getValue(), state);
+  state.outputPWM_ = VelocityControl<id>::template doVelocityUpdate<Device>(
+      positionPid_.getValue(), state);
 
   Device::setValueChanged(VelocityObjects::VelocityError);
   Device::setValueChanged(VelocityObjects::VelocityDemandValue);

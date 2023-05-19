@@ -8,18 +8,20 @@ template <size_t n> class BldcMotorCurrent {
 public:
   BldcMotorCurrent() = default;
 
-  void updateCurrentAverage(float alpha, float beta);
-  void goToNextAverage();
+  void update(float alpha, float beta);
 
-  float getOrientedCurrent() const;
   float getAngleDifference() const;
+  float getOrientedCurrent() const;
   float getMagnitude() const;
-  float getAngle() const;
 
 private:
-  modm::filter::MovingAverage<float, n> alpha_{}, beta_{};
-  bool hasLast_{false};
-  float lastMagnitude_{0.0f}, lastAngle_{0.0f};
+  static float angle(float alpha, float beta);
+  static float magnitude(float alpha, float beta);
+  static float angleDiff(float angle, float lastAngle);
+
+  float alpha_{0.0f}, beta_{0.0f};
+  bool hasLast_{false}, hasFirst_{false};
+  float lastAlpha_{0.0f}, lastBeta_{0.0f};
 };
 } // namespace librobots2::motor
 #include "bldc_motor_current_impl.hpp"
