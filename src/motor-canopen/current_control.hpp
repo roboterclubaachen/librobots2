@@ -30,6 +30,7 @@ public:
   static inline modm::Clock::time_point lastExecute_{modm::Clock::now()};
   static inline modm::BoundedDeque<std::pair<float, uint16_t>, 256>
       currentValues_{};
+  static inline float t_pt1 = 1000.0f, k_pt1 = 1.0f;
 
   static float getCharge();
 
