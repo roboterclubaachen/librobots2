@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <limits>
 
-#include <modm-canopen/canopen_device.hpp>
+#include <modm-canopen/device/canopen_device.hpp>
 #include <modm-canopen/object_dictionary.hpp>
 
 #include "current_control.hpp"

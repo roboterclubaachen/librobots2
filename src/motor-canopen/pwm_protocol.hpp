@@ -2,12 +2,11 @@
 #define PWM_PROTOCOL_HPP
 #include <cstdint>
 
-#include <modm-canopen/canopen_device.hpp>
+#include "motor_state.hpp"
 #include <modm-canopen/cia402/operating_mode.hpp>
 #include <modm-canopen/cia402/states.hpp>
+#include <modm-canopen/device/canopen_device.hpp>
 #include <modm-canopen/object_dictionary.hpp>
-
-#include "motor_state.hpp"
 
 struct PWMObjects {
   static constexpr modm_canopen::Address PWMCommand{0x2002, 0}; // Custom

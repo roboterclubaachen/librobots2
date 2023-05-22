@@ -3,11 +3,10 @@
 #include <cstdint>
 #include <limits>
 
-#include <modm-canopen/canopen_device.hpp>
+#include "motor_state.hpp"
+#include <modm-canopen/device/canopen_device.hpp>
 #include <modm-canopen/object_dictionary.hpp>
 #include <modm/math/filter/pid.hpp>
-
-#include "motor_state.hpp"
 using Pid = modm::Pid<float>;
 
 struct PositionObjects {

@@ -21,8 +21,8 @@ def init(module):
 
 def prepare(module, options):
     module.depends(
-        "modm-canopen:device",
-        "modm-canopen:device:cia402",
+        "modm-canopen:common",
+        "modm-canopen:common:cia402",
         "modm:math:filter",
         "modm:container"
     )

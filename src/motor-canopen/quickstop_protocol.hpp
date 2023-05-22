@@ -3,11 +3,10 @@
 #include <cstdint>
 #include <limits>
 
-#include <modm-canopen/canopen_device.hpp>
-#include <modm-canopen/object_dictionary.hpp>
-
 #include "motor_state.hpp"
 #include "velocity_control.hpp"
+#include <modm-canopen/device/canopen_device.hpp>
+#include <modm-canopen/object_dictionary.hpp>
 
 struct QuickStopObjects {
   static constexpr modm_canopen::Address QuickStopDeceleration{0x6085,

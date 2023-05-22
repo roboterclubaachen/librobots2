@@ -3,12 +3,10 @@
 #include <cstdint>
 #include <limits>
 
-#include <modm-canopen/canopen_device.hpp>
-#include <modm-canopen/object_dictionary.hpp>
-
 #include "motor_state.hpp"
-
 #include <chrono>
+#include <modm-canopen/device/canopen_device.hpp>
+#include <modm-canopen/object_dictionary.hpp>
 #include <modm/processing/timer.hpp>
 
 using namespace std::literals;

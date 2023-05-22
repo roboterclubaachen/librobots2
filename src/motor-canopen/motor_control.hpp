@@ -1,7 +1,7 @@
 #ifndef MOTOR_CONTROL_HPP
 #define MOTOR_CONTROL_HPP
 #include "motor_state.hpp"
-#include <modm-canopen/canopen_device.hpp>
+#include <modm-canopen/device/canopen_device.hpp>
 
 #include "heartbeat_protocol.hpp"
 #include "identity_protocol.hpp"
