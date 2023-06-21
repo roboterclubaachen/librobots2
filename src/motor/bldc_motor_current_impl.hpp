@@ -2,10 +2,9 @@
 #error                                                                         \
     "Do not use this file directly, include 'bldc_motor_current.hpp' instead!"
 #endif
+#include <numbers>
 
 namespace librobots2::motor {
-
-static constexpr auto M_PI = 3.14159265358979323846;
 
 template <size_t n>
 void BldcMotorCurrent<n>::updateCurrentAverage(float alpha, float beta) {
@@ -37,10 +36,11 @@ template <size_t n> float BldcMotorCurrent<n>::getAngleDifference() const {
   if (!hasLast_)
     return 0.0f;
   auto angleDiff = getAngle() - lastAngle_;
-  angleDiff = std::fmod(angleDiff + M_PI, 2.0 * M_PI);
+  angleDiff = std::fmod(angleDiff + std::numbers::pi_v<float>,
+                        2.0 * std::numbers::pi_v<float>);
   if (angleDiff <= 0.0)
-    return angleDiff + M_PI;
-  return angleDiff - M_PI;
+    return angleDiff + std::numbers::pi_v<float>;
+  return angleDiff - std::numbers::pi_v<float>;
 }
 
 template <size_t n> float BldcMotorCurrent<n>::getOrientedCurrent() const {

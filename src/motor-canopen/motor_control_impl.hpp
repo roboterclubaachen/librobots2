@@ -145,8 +145,9 @@ constexpr void MotorControl<id, Modes...>::registerHandlers(
   map.template setReadHandler<StateObjects::OutputPWM>(
       +[]() { return state_.outputPWM_; });
 
-  map.template setReadHandler<StateObjects::ActualCurrent>(
-      +[]() { return state_.actualCurrent_; });
+  map.template setReadHandler<StateObjects::ActualCurrent>(+[]() {
+    return state_.actualCurrent_ - CurrentControl<id>::zeroAverage_.getValue();
+  });
 
   map.template setReadHandler<StateObjects::PositionFactorNumerator>(
       +[]() { return state_.scalingFactors_.position.numerator; });

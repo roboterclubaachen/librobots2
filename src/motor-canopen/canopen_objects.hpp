@@ -63,6 +63,8 @@ struct Objects {
   static constexpr modm_canopen::Address ActualCurrent{0x2013, 0}; // Custom
   static constexpr modm_canopen::Address MaxCurrent{0x2011, 0};    // Custom
   static constexpr modm_canopen::Address MaxCharge{0x2015, 0};     // Custom
+  static constexpr modm_canopen::Address FilteredActualCurrent{0x2018,
+                                                               0}; // Custom
 
   // Factors
   static constexpr modm_canopen::Address PositionFactorNumerator{0x6093, 1};

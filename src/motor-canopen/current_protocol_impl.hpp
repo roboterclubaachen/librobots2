@@ -9,11 +9,11 @@ using OperatingMode = modm_canopen::cia402::OperatingMode;
 template <size_t id>
 template <typename Device, typename MessageCallback>
 bool CurrentProtocol<id>::update(MotorState &state, MessageCallback &&) {
+
+  state.outputPWM_ =
+      CurrentControl<id>::template update<Device>(targetCurrent_, state);
   if (targetCurrent_ == 0.0f) {
     state.outputPWM_ = 0;
-  } else {
-    state.outputPWM_ =
-        CurrentControl<id>::template update<Device>(targetCurrent_, state);
   }
   return true;
 }
@@ -27,6 +27,9 @@ constexpr void CurrentProtocol<id>::registerHandlers(
   map.template setReadHandler<CurrentObjects::CommandedCurrent>(
       +[]() { return CurrentControl<id>::commandedCurrent_; });
 
+  map.template setReadHandler<CurrentObjects::FilteredActualCurrent>(
+      +[]() { return CurrentControl<id>::filteredActualCurrent_; });
+
   map.template setReadHandler<CurrentObjects::TargetCurrent>(
       +[]() { return targetCurrent_; });
 
@@ -37,6 +40,9 @@ constexpr void CurrentProtocol<id>::registerHandlers(
 
   map.template setReadHandler<CurrentObjects::CurrentError>(
       +[]() { return CurrentControl<id>::currentError_; });
+
+  map.template setReadHandler<CurrentObjects::CurrentCharge>(
+      +[]() { return CurrentControl<id>::currentCharge_; });
 
   map.template setWriteHandler<CurrentObjects::CurrentPID_kP>(+[](float value) {
     CurrentControl<id>::currentPidParameters_.setKp(value);
