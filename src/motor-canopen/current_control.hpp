@@ -34,12 +34,14 @@ public:
   static inline float currentCharge_{};
   static inline float filteredActualCurrent_{0.0f};
   static inline modm::Clock::time_point lastExecute_{modm::Clock::now()};
-  static inline modm::BoundedDeque<std::pair<float, uint16_t>, 256>
+  static inline modm::BoundedDeque<std::pair<float, float>, 256>
       currentValues_{};
   static constexpr uint16_t zeroAverageCountdownReset_{256};
   static inline uint16_t zeroAverageCountdown_{zeroAverageCountdownReset_};
   static inline modm::filter::MovingAverage<float, 16> zeroAverage_{};
   static inline float t_pt1 = 2.0f, k_pt1 = 1.0f;
+  static constexpr float rampMultiplierReset_{0.01f}, rampIncrement_ = 0.01f;
+  static inline float rampMultiplier_{rampMultiplierReset_};
 
   static float getCharge();
 
@@ -47,6 +49,7 @@ public:
   static int16_t update(float commandedCurrent, const MotorState &state);
 
   static void resetIfApplicable(const MotorState &state);
+  static void reset();
 };
 
 #include "current_control_impl.hpp"

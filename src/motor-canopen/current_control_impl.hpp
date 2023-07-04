@@ -10,25 +10,40 @@ int16_t CurrentControl<id>::update(float inCurrent, const MotorState &state) {
 
   const auto now = modm::Clock::now();
   const auto timeSinceLastExecute = now - lastExecute_;
+  const float secondsSinceLastExecute = timeSinceLastExecute.count() / 1000.0f;
   lastExecute_ = now;
+  if (rampMultiplier_ < 1.0f) {
+    rampMultiplier_ += rampIncrement_;
+  }
+  if (rampMultiplier_ > 1.0f) {
+    rampMultiplier_ = 1.0f;
+  }
 
   // Filter current with PT1
   // filteredActualCurrent_ =
   //   filteredActualCurrent_ +
   //   (k_pt1 * state.actualCurrent_ - filteredActualCurrent_) *
   //        timeSinceLastExecute.count() / (1000.0f * t_pt1);
-  filteredActualCurrent_ = state.actualCurrent_ - zeroAverage_.getValue();
+
+  // Reset on sign change
+  // Relies on filteredActualCurrent_ being the old value!
+  if (std::signbit(inCurrent) != std::signbit(filteredActualCurrent_) ||
+      inCurrent == 0.0f) {
+    // reset();
+  }
+  // Copy sign of in current to actual Current
+  filteredActualCurrent_ =
+      std::copysign(state.actualCurrent_ - zeroAverage_.getValue(), inCurrent);
   Device::setValueChanged(CurrentObjects::FilteredActualCurrent);
 
   // Calculate remaining charge
   currentValues_.appendOverwrite(
-      {std::abs(filteredActualCurrent_), timeSinceLastExecute.count()});
+      {std::abs(filteredActualCurrent_), secondsSinceLastExecute});
   currentCharge_ = getCharge();
   Device::setValueChanged(CurrentObjects::CurrentCharge);
   const auto remainingCharge =
       std::abs(std::abs(state.maxCharge_) - std::abs(currentCharge_));
-  const auto remainingCurrent =
-      remainingCharge / (timeSinceLastExecute.count() / 1000.0f);
+  const auto remainingCurrent = remainingCharge / secondsSinceLastExecute;
 
   // Limit current to charge budget
   if (remainingCurrent <= 0.0f)
@@ -51,7 +66,7 @@ int16_t CurrentControl<id>::update(float inCurrent, const MotorState &state) {
   Device::setValueChanged(CurrentObjects::CurrentError);
   currentPid_.update(currentError_);
 
-  auto newPWM = (int16_t)(currentPid_.getValue());
+  auto newPWM = (int16_t)(currentPid_.getValue()) * rampMultiplier_;
   /*constexpr auto maxPWMChange = 1000;
   if (std::abs(newPWM - state.outputPWM_) > maxPWMChange) {
     if (newPWM - state.outputPWM_ > 0) {
@@ -67,6 +82,7 @@ template <size_t id>
 void CurrentControl<id>::resetIfApplicable(const MotorState &state) {
   if (state.outputPWM_ == 0 &&
       std::abs(state.actualVelocity_.getValue()) <= 0.001f) {
+    rampMultiplier_ = rampMultiplierReset_;
     if (zeroAverageCountdown_ == 0) {
       zeroAverage_.update(state.actualCurrent_);
     } else {
@@ -78,13 +94,13 @@ void CurrentControl<id>::resetIfApplicable(const MotorState &state) {
   if (!state.enableMotor_ ||
       state.status_.state() != modm_canopen::cia402::State::OperationEnabled ||
       state.mode_ == OperatingMode::Disabled) {
-    currentPid_.reset();
+    reset();
   }
 }
 
 template <size_t id> float CurrentControl<id>::getCharge() {
   float accCurr = 0.0f;
-  int32_t accTime = 0;
+  float accTime = 0;
   for (auto &pair : currentValues_) {
     accCurr += pair.first;
     accTime += pair.second;
@@ -92,5 +108,11 @@ template <size_t id> float CurrentControl<id>::getCharge() {
   if (accTime < 50)
     return 0.0f;
   accCurr /= currentValues_.getSize();
-  return accCurr * accTime / 1000.0f; // Convert to As from A * ms
+  return accCurr * accTime;
+}
+
+template <size_t id> void CurrentControl<id>::reset() {
+  currentPid_.reset();
+  currentValues_.clear();
+  lastExecute_ = modm::Clock::now();
 }
