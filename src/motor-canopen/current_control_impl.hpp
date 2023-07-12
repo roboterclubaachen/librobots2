@@ -19,18 +19,6 @@ int16_t CurrentControl<id>::update(float inCurrent, const MotorState &state) {
     rampMultiplier_ = 1.0f;
   }
 
-  // Filter current with PT1
-  // filteredActualCurrent_ =
-  //   filteredActualCurrent_ +
-  //   (k_pt1 * state.actualCurrent_ - filteredActualCurrent_) *
-  //        timeSinceLastExecute.count() / (1000.0f * t_pt1);
-
-  // Reset on sign change
-  // Relies on filteredActualCurrent_ being the old value!
-  if (std::signbit(inCurrent) != std::signbit(filteredActualCurrent_) ||
-      inCurrent == 0.0f) {
-    // reset();
-  }
   // Copy sign of in current to actual Current
   filteredActualCurrent_ =
       std::copysign(state.actualCurrent_ - zeroAverage_.getValue(), inCurrent);
@@ -66,16 +54,7 @@ int16_t CurrentControl<id>::update(float inCurrent, const MotorState &state) {
   Device::setValueChanged(CurrentObjects::CurrentError);
   currentPid_.update(currentError_);
 
-  auto newPWM = (int16_t)(currentPid_.getValue()) * rampMultiplier_;
-  /*constexpr auto maxPWMChange = 1000;
-  if (std::abs(newPWM - state.outputPWM_) > maxPWMChange) {
-    if (newPWM - state.outputPWM_ > 0) {
-      newPWM = state.outputPWM_ + maxPWMChange;
-    } else {
-      newPWM = state.outputPWM_ - maxPWMChange;
-    }
-  }*/
-  return newPWM;
+  return (int16_t)(currentPid_.getValue()) * rampMultiplier_;
 }
 
 template <size_t id>

@@ -49,7 +49,8 @@ constexpr void VelocityProtocol<id>::registerHandlers(
     modm_canopen::HandlerMap<ObjectDictionary> &map) {
   using modm_canopen::SdoErrorCode;
   map.template setReadHandler<VelocityObjects::VelocityDemandValue>(+[]() {
-    return state.scalingFactors_.velocity.toUser(commandedVelocity_);
+    return state.scalingFactors_.velocity.toUser(
+        VelocityControl<id>::commandedVel_);
   });
 
   map.template setReadHandler<VelocityObjects::VelocityError>(+[]() {

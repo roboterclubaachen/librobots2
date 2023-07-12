@@ -39,7 +39,6 @@ public:
   static constexpr uint16_t zeroAverageCountdownReset_{256};
   static inline uint16_t zeroAverageCountdown_{zeroAverageCountdownReset_};
   static inline modm::filter::MovingAverage<float, 16> zeroAverage_{};
-  static inline float t_pt1 = 2.0f, k_pt1 = 1.0f;
   static constexpr float rampMultiplierReset_{0.01f}, rampIncrement_ = 0.01f;
   static inline float rampMultiplier_{rampMultiplierReset_};
 

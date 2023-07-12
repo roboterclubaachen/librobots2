@@ -30,6 +30,7 @@ public:
   static inline Pid velocityPid_;
   static inline int32_t profileAcceleration_{5000};
 
+  static inline int32_t commandedVel_{0};
   static inline int32_t velocityError_{};
 
   template <typename Device>
@@ -42,25 +43,27 @@ public:
 
   static inline void resetIfApplicable(const MotorState &state);
 
+  static inline void reset();
+
 private:
-  static inline int32_t lastCommandedVel_{0};
 };
 
 template <size_t id>
 template <typename Device>
-int16_t VelocityControl<id>::doVelocityUpdate(int32_t commandedVelocity,
+int16_t VelocityControl<id>::doVelocityUpdate(int32_t inVelocity,
                                               const MotorState &state) {
 
-  if (std::signbit(lastCommandedVel_) != std::signbit(commandedVelocity) &&
-      (commandedVelocity != 0 && lastCommandedVel_ != 0)) {
-    velocityPid_.reset();
+  if (std::signbit(commandedVel_) != std::signbit(inVelocity) &&
+      (inVelocity != 0 && commandedVel_ != 0)) {
+    MODM_LOG_DEBUG << "A" << modm::endl;
+    reset();
   }
-  lastCommandedVel_ = commandedVelocity;
-  if (std::signbit(commandedVelocity) ==
-          std::signbit(state.actualVelocity_.getValue()) ||
-      state.actualVelocity_.getValue() == 0) {
+  commandedVel_ = inVelocity;
+  if ((std::signbit(commandedVel_) ==
+       std::signbit(state.actualVelocity_.getValue())) ||
+      (state.actualVelocity_.getValue() == 0 && commandedVel_ != 0)) {
 
-    velocityError_ = commandedVelocity - state.actualVelocity_.getValue();
+    velocityError_ = commandedVel_ - state.actualVelocity_.getValue();
     velocityPid_.update(velocityError_,
                         state.outputPWM_ > profileAcceleration_);
     Device::setValueChanged(VelocityObjects::VelocityError);
@@ -74,7 +77,7 @@ template <size_t id>
 template <typename Device>
 int16_t VelocityControl<id>::doDecelerationUpdate(int32_t commandedDeceleration,
                                                   const MotorState &state) {
-  lastCommandedVel_ = 0;
+  commandedVel_ = 0;
   velocityError_ = -state.actualVelocity_.getValue();
   velocityPid_.update(velocityError_, state.outputPWM_ > commandedDeceleration);
   Device::setValueChanged(VelocityObjects::VelocityError);
@@ -90,8 +93,13 @@ void VelocityControl<id>::resetIfApplicable(const MotorState &state) {
       state.status_.state() != modm_canopen::cia402::State::OperationEnabled ||
       state.mode_ == OperatingMode::Disabled ||
       state.mode_ == OperatingMode::Voltage) {
-    velocityPid_.reset();
+    reset();
   }
+}
+
+template <size_t id> void VelocityControl<id>::reset() {
+  velocityPid_.reset();
+  CurrentControl<id>::reset();
 }
 
 #endif

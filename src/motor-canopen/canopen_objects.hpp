@@ -35,6 +35,8 @@ struct Objects {
                                                                  4}; // Custom
 
   // Velocity Mode
+  static constexpr modm_canopen::Address VelocityDemandValue{0x606B,
+                                                             0}; // User units
   static constexpr modm_canopen::Address VelocityActualValue{0x606C,
                                                              0}; // User units
   static constexpr modm_canopen::Address TargetVelocity{0x60FF,
@@ -63,6 +65,7 @@ struct Objects {
   static constexpr modm_canopen::Address ActualCurrent{0x2013, 0}; // Custom
   static constexpr modm_canopen::Address MaxCurrent{0x2011, 0};    // Custom
   static constexpr modm_canopen::Address MaxCharge{0x2015, 0};     // Custom
+  static constexpr modm_canopen::Address CurrentCharge{0x2017, 0}; // Custom
   static constexpr modm_canopen::Address FilteredActualCurrent{0x2018,
                                                                0}; // Custom
 
