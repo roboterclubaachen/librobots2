@@ -28,8 +28,8 @@ struct PositionObjects {
 
 template <size_t id> class PositionProtocol {
 public:
-  static inline Pid::Parameter positionPidParameters_{
-      1.0f, 0.0f, 0.0f, 1000000.0f, std::numeric_limits<int16_t>::max()};
+  static inline Pid::Parameter positionPidParameters_{1.0f, 0.0f, 0.0f,
+                                                      1000000.0f, 7000};
   static inline Pid positionPid_;
   static inline bool receivedPositionRelative_{true};
   static inline int32_t receivedPosition_{};
@@ -42,15 +42,7 @@ public:
   static inline uint32_t inPositionWindow_{0};
 
 public:
-  static bool applicable(const MotorState &state) {
-    auto value =
-        state.mode_ == OperatingMode::Position &&
-        state.status_.state() == modm_canopen::cia402::State::OperationEnabled;
-    if (!value) {
-      positionPid_.reset();
-    }
-    return value;
-  }
+  static bool applicable(const MotorState &state);
 
   template <typename Device, typename MessageCallback>
   static bool update(MotorState &state, MessageCallback &&cb);

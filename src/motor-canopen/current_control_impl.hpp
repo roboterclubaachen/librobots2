@@ -19,6 +19,10 @@ int16_t CurrentControl<id>::update(float inCurrent, const MotorState &state) {
     rampMultiplier_ = 1.0f;
   }
 
+  if (std::signbit(inCurrent) != std::signbit(filteredActualCurrent_)) {
+    currentPid_.reset();
+  }
+
   // Copy sign of in current to actual Current
   filteredActualCurrent_ =
       std::copysign(state.actualCurrent_ - zeroAverage_.getValue(), inCurrent);
@@ -52,9 +56,15 @@ int16_t CurrentControl<id>::update(float inCurrent, const MotorState &state) {
 
   currentError_ = commandedCurrent_ - filteredActualCurrent_;
   Device::setValueChanged(CurrentObjects::CurrentError);
+
+  if (std::abs(commandedCurrent_) < 0.05)
+    return 0;
+
   currentPid_.update(currentError_);
 
-  return (int16_t)(currentPid_.getValue()) * rampMultiplier_;
+  return (int16_t)(std::clamp(
+      currentPid_.getValue(), (float)std::numeric_limits<int16_t>::min(),
+      (float)std::numeric_limits<int16_t>::max())); // * rampMultiplier_;
 }
 
 template <size_t id>
@@ -91,7 +101,7 @@ template <size_t id> float CurrentControl<id>::getCharge() {
 }
 
 template <size_t id> void CurrentControl<id>::reset() {
-  currentPid_.reset();
-  currentValues_.clear();
-  lastExecute_ = modm::Clock::now();
+  // currentPid_.reset();
+  // currentValues_.clear();
+  // lastExecute_ = modm::Clock::now();
 }

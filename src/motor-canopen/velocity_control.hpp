@@ -55,7 +55,6 @@ int16_t VelocityControl<id>::doVelocityUpdate(int32_t inVelocity,
 
   if (std::signbit(commandedVel_) != std::signbit(inVelocity) &&
       (inVelocity != 0 && commandedVel_ != 0)) {
-    MODM_LOG_DEBUG << "A" << modm::endl;
     reset();
   }
   commandedVel_ = inVelocity;

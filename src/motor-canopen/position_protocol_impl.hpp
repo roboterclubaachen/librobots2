@@ -6,6 +6,20 @@
 #include <modm/debug/logger.hpp>
 
 template <size_t id>
+bool PositionProtocol<id>::applicable(const MotorState &state) {
+  const auto value =
+      state.mode_ == OperatingMode::Position &&
+      state.status_.state() == modm_canopen::cia402::State::OperationEnabled;
+  if (!value) {
+    positionPid_.reset();
+    if (state.mode_ == OperatingMode::Position) {
+      VelocityControl<id>::reset();
+    }
+  }
+  return value;
+}
+
+template <size_t id>
 template <typename Device, typename MessageCallback>
 bool PositionProtocol<id>::update(MotorState &state, MessageCallback &&) {
   if (state.control_.isSet<CommandBits::NewSetPoint>()) {
@@ -26,12 +40,13 @@ bool PositionProtocol<id>::update(MotorState &state, MessageCallback &&) {
       MODM_LOG_INFO << "Updated Target Position absolute!" << modm::endl;
     }
     Device::setValueChanged(PositionObjects::PositionDemandValue);
+    VelocityControl<id>::reset();
   }
 
   positionError_ = commandedPosition_ - state.actualPosition_;
   Device::setValueChanged(PositionObjects::FollowingErrorActualValue);
 
-  positionPid_.update(positionError_);
+  positionPid_.update(positionError_, std::abs(positionPid_.getValue()) > 6000);
   state.outputPWM_ = VelocityControl<id>::template doVelocityUpdate<Device>(
       positionPid_.getValue(), state);
 
