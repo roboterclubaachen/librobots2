@@ -4,3 +4,4 @@
 #include "identity_objects.hpp"
 #include "state_objects.hpp"
 #include "velocity_objects.hpp"
+#include "pwm_objects.hpp"

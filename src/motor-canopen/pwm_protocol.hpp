@@ -7,10 +7,8 @@
 #include <modm-canopen/cia402/states.hpp>
 #include <modm-canopen/device/canopen_device.hpp>
 #include <modm-canopen/object_dictionary.hpp>
+#include "pwm_objects.hpp"
 
-struct PWMObjects {
-  static constexpr modm_canopen::Address PWMCommand{0x2002, 0}; // Custom
-};
 
 template <size_t id> class PWMProtocol {
 public:

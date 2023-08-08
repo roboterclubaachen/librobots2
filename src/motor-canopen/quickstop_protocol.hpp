@@ -7,11 +7,8 @@
 #include "velocity_control.hpp"
 #include <modm-canopen/device/canopen_device.hpp>
 #include <modm-canopen/object_dictionary.hpp>
+#include "quickstop_objects.hpp"
 
-struct QuickStopObjects {
-  static constexpr modm_canopen::Address QuickStopDeceleration{0x6085,
-                                                               0}; // User units
-};
 
 template <size_t id> class QuickstopProtocol {
 public:
