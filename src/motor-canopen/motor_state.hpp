@@ -57,7 +57,7 @@ struct MotorState {
 
   float actualCurrent_{};
   float maxCurrent_{2.0f};
-  float maxCharge_{1};
+  float maxCharge_{0.1f};
 
   modm::filter::MovingAverage<int32_t, 16> actualVelocity_{};
 

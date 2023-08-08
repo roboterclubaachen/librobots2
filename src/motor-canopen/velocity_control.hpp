@@ -29,6 +29,7 @@ public:
       1.0f, 0.0f, 0.0f, 10000000.0f, std::numeric_limits<int16_t>::max()};
   static inline Pid velocityPid_;
   static inline int32_t profileAcceleration_{5000};
+  static inline bool isLimiting_{false};
 
   static inline int32_t commandedVel_{0};
   static inline int32_t velocityError_{};
@@ -61,10 +62,10 @@ int16_t VelocityControl<id>::doVelocityUpdate(int32_t inVelocity,
   if ((std::signbit(commandedVel_) ==
        std::signbit(state.actualVelocity_.getValue())) ||
       (state.actualVelocity_.getValue() == 0 && commandedVel_ != 0)) {
-
+    isLimiting_ = state.outputPWM_ > profileAcceleration_ ||
+                  CurrentControl<id>::isLimiting_;
     velocityError_ = commandedVel_ - state.actualVelocity_.getValue();
-    velocityPid_.update(velocityError_,
-                        state.outputPWM_ > profileAcceleration_);
+    velocityPid_.update(velocityError_, isLimiting_);
     Device::setValueChanged(VelocityObjects::VelocityError);
     return CurrentControl<id>::template update<Device>(velocityPid_.getValue(),
                                                        state);
@@ -78,7 +79,9 @@ int16_t VelocityControl<id>::doDecelerationUpdate(int32_t commandedDeceleration,
                                                   const MotorState &state) {
   commandedVel_ = 0;
   velocityError_ = -state.actualVelocity_.getValue();
-  velocityPid_.update(velocityError_, state.outputPWM_ > commandedDeceleration);
+  isLimiting_ = state.outputPWM_ > commandedDeceleration ||
+                CurrentControl<id>::isLimiting_;
+  velocityPid_.update(velocityError_, isLimiting_);
   Device::setValueChanged(VelocityObjects::VelocityError);
   return (int16_t)std::clamp(
       (int32_t)CurrentControl<id>::template update<Device>(

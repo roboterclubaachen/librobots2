@@ -32,6 +32,7 @@ public:
   static inline float currentError_{};
   static inline float commandedCurrent_{};
   static inline float currentCharge_{};
+  static inline bool isLimiting_{false};
   static inline float filteredActualCurrent_{0.0f};
   static inline modm::Clock::time_point lastExecute_{modm::Clock::now()};
   static inline modm::BoundedDeque<std::pair<float, float>, 256>

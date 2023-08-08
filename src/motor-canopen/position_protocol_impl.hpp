@@ -46,7 +46,9 @@ bool PositionProtocol<id>::update(MotorState &state, MessageCallback &&) {
   positionError_ = commandedPosition_ - state.actualPosition_;
   Device::setValueChanged(PositionObjects::FollowingErrorActualValue);
 
-  positionPid_.update(positionError_, std::abs(positionPid_.getValue()) > 6000);
+  positionPid_.update(positionError_,
+                      std::abs(positionPid_.getValue()) > 6000 ||
+                          VelocityControl<id>::isLimiting_);
   state.outputPWM_ = VelocityControl<id>::template doVelocityUpdate<Device>(
       positionPid_.getValue(), state);
 
