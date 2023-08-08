@@ -4,21 +4,12 @@
 #include <limits>
 
 #include "motor_state.hpp"
+#include "identity_objects.hpp"
 #include <modm-canopen/device/canopen_device.hpp>
 #include <modm-canopen/object_dictionary.hpp>
 
 #include <chrono>
 #include <modm/processing/timer.hpp>
-
-struct IdentityObjects {
-  static constexpr modm_canopen::Address DeviceType{0x1000, 0};
-  static constexpr modm_canopen::Address ErrorRegister{0x1001, 0};
-  static constexpr modm_canopen::Address IdentityObject{0x1018, 0};
-  static constexpr modm_canopen::Address VendorId{0x1018, 1};
-  static constexpr modm_canopen::Address ProductCode{0x1018, 2};
-  static constexpr modm_canopen::Address RevisionId{0x1018, 3};
-  static constexpr modm_canopen::Address SerialNumber{0x1018, 4};
-};
 
 template <size_t id> class IdentityProtocol {
 public:
