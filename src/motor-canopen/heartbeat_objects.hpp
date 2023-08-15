@@ -1,5 +1,5 @@
 #pragma once
-#include "motor_state.hpp"
+#include <modm-canopen/object_dictionary_common.hpp>
 
 struct HeartbeatObjects {
   static constexpr modm_canopen::Address TimeBetweenHeartbeats{0x1017, 0};

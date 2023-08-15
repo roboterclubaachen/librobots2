@@ -72,7 +72,7 @@ constexpr void HeartbeatProtocol<id>::registerHandlers(
   map.template setWriteHandler<HeartbeatObjects::TimeBetweenHeartbeats>(
       +[](uint16_t value) {
         timeBetweenHeatbeats = std::chrono::milliseconds((int64_t)value);
-        heartBeatTimer_ = modm::PeriodicTimer{timeBetweenHeatbeats / 2};
+        heartBeatTimer_ = modm::PeriodicTimer{timeBetweenHeatbeats / 4};
         return SdoErrorCode::NoError;
       });
 
