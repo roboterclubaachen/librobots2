@@ -6,8 +6,9 @@ template <size_t id>
 template <typename Device, typename MessageCallback>
 bool QuickstopProtocol<id>::update(MotorState &state, MessageCallback &&) {
   if (state.status_.state() == modm_canopen::cia402::State::QuickStopActive) {
-    state.outputPWM_ = VelocityControl<id>::doDecelerationUpdate(
-        quickStopDeceleration_, state);
+    state.outputPWM_ =
+        VelocityControl<id>::template doDecelerationUpdate<Device>(
+            quickStopDeceleration_, state);
     Device::setValueChanged(VelocityObjects::VelocityDemandValue);
     Device::setValueChanged(VelocityObjects::VelocityError);
     state.status_

@@ -3,27 +3,22 @@
 #include <cstdint>
 #include <limits>
 
-#include <modm-canopen/canopen_device.hpp>
-#include <modm-canopen/object_dictionary.hpp>
-
+#include "heartbeat_objects.hpp"
 #include "motor_state.hpp"
-
 #include <chrono>
+#include <modm-canopen/device/canopen_device.hpp>
+#include <modm-canopen/object_dictionary.hpp>
 #include <modm/processing/timer.hpp>
 
-using namespace std::literals;
 
-struct HeartbeatObjects {
-  static constexpr modm_canopen::Address TimeBetweenHeartbeats{0x1017, 0};
-  static constexpr modm_canopen::Address MasterHeartbeatTimeout{0x2009, 0};
-};
+using namespace std::literals;
 
 template <size_t id> class HeartbeatProtocol {
 public:
   static constexpr auto masterID = 0;
-  static inline auto timeBetweenHeatbeats{200ms};
-  static inline modm::PeriodicTimer heartBeatTimer_{timeBetweenHeatbeats / 2};
-  static inline auto masterHeartbeatTimeout{200ms};
+  static inline auto timeBetweenHeatbeats{400ms};
+  static inline modm::PeriodicTimer heartBeatTimer_{timeBetweenHeatbeats / 4};
+  static inline auto masterHeartbeatTimeout{400ms};
   static inline bool receivedMasterHeartbeat{false};
   static inline modm::Clock::time_point lastMasterHeartbeat{};
 

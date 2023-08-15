@@ -2,16 +2,13 @@
 #define PWM_PROTOCOL_HPP
 #include <cstdint>
 
-#include <modm-canopen/canopen_device.hpp>
+#include "motor_state.hpp"
 #include <modm-canopen/cia402/operating_mode.hpp>
 #include <modm-canopen/cia402/states.hpp>
+#include <modm-canopen/device/canopen_device.hpp>
 #include <modm-canopen/object_dictionary.hpp>
+#include "pwm_objects.hpp"
 
-#include "motor_state.hpp"
-
-struct PWMObjects {
-  static constexpr modm_canopen::Address PWMCommand{0x2002, 0}; // Custom
-};
 
 template <size_t id> class PWMProtocol {
 public:
@@ -19,7 +16,7 @@ public:
 
 public:
   static bool applicable(const MotorState &state) {
-    return state.enableMotor_ && state.mode_ == OperatingMode::Voltage &&
+    return state.mode_ == OperatingMode::Voltage &&
            state.status_.state() ==
                modm_canopen::cia402::State::OperationEnabled;
   }

@@ -16,19 +16,20 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 def init(module):
-    module.name = ":motor-canopen"
+    module.name = ":motor-sim"
 
 
 def prepare(module, options):
     module.depends(
-        "modm-canopen:common",
-        "modm-canopen:common:cia402",
         "modm:math:filter",
-        "modm:container"
+        "modm:container",
+        "modm:platform:core",
+        "librobots2:motor",
+        "modm:processing:timer"
     )
     return True
 
 
 def build(env):
-    env.outbasepath = "librobots2/src/librobots2/motor-canopen"
+    env.outbasepath = "librobots2/src/librobots2/motor-sim"
     env.copy(".")

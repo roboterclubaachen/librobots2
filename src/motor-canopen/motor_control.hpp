@@ -1,7 +1,7 @@
 #ifndef MOTOR_CONTROL_HPP
 #define MOTOR_CONTROL_HPP
 #include "motor_state.hpp"
-#include <modm-canopen/canopen_device.hpp>
+#include <modm-canopen/device/canopen_device.hpp>
 
 #include "heartbeat_protocol.hpp"
 #include "identity_protocol.hpp"
@@ -35,7 +35,13 @@ public:
     state_.actualPosition_ = position;
   }
 
+  static inline void setOrientedCurrent(float current) {
+    state_.actualCurrent_ = current;
+  }
+
   static inline int16_t outputPWM() { return state_.outputPWM_; }
+
+  static inline float maxCurrent() { return state_.maxCurrent_; }
 
   template <typename ObjectDictionary>
   constexpr void

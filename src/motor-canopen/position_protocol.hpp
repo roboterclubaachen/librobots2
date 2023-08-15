@@ -3,34 +3,19 @@
 #include <cstdint>
 #include <limits>
 
-#include <modm-canopen/canopen_device.hpp>
+#include "motor_state.hpp"
+#include <modm-canopen/device/canopen_device.hpp>
 #include <modm-canopen/object_dictionary.hpp>
 #include <modm/math/filter/pid.hpp>
-
-#include "motor_state.hpp"
+#include "position_objects.hpp"
 using Pid = modm::Pid<float>;
 
-struct PositionObjects {
-  static constexpr modm_canopen::Address PositionDemandValue{0x6062,
-                                                             0}; // User units
-  static constexpr modm_canopen::Address TargetPosition{0x607A,
-                                                        0}; // User units
-  static constexpr modm_canopen::Address PositionWindow{0x6067,
-                                                        0}; // User units
-  static constexpr modm_canopen::Address FollowingErrorActualValue{
-      0x60F4, 0}; // User units
 
-  static constexpr modm_canopen::Address PositionPID_kP{0x2006, 1}; // Custom
-  static constexpr modm_canopen::Address PositionPID_kI{0x2006, 2}; // Custom
-  static constexpr modm_canopen::Address PositionPID_kD{0x2006, 3}; // Custom
-  static constexpr modm_canopen::Address PositionPID_MaxErrorSum{0x2006,
-                                                                 4}; // Custom
-};
 
 template <size_t id> class PositionProtocol {
 public:
-  static inline Pid::Parameter positionPidParameters_{
-      1.0f, 0.0f, 0.0f, 1000000.0f, std::numeric_limits<int16_t>::max()};
+  static inline Pid::Parameter positionPidParameters_{1.0f, 0.0f, 0.0f,
+                                                      1000000.0f, 7000};
   static inline Pid positionPid_;
   static inline bool receivedPositionRelative_{true};
   static inline int32_t receivedPosition_{};
@@ -43,15 +28,7 @@ public:
   static inline uint32_t inPositionWindow_{0};
 
 public:
-  static bool applicable(const MotorState &state) {
-    auto value =
-        state.enableMotor_ && state.mode_ == OperatingMode::Position &&
-        state.status_.state() == modm_canopen::cia402::State::OperationEnabled;
-    if (!value) {
-      positionPid_.reset();
-    }
-    return value;
-  }
+  static bool applicable(const MotorState &state);
 
   template <typename Device, typename MessageCallback>
   static bool update(MotorState &state, MessageCallback &&cb);

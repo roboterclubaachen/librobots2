@@ -52,6 +52,7 @@ bool MotorControl<id, Modes...>::update(MessageCallback &&cb) {
   Device::setValueChanged(StateObjects::PositionInternalValue);
   Device::setValueChanged(StateObjects::PositionActualValue);
   Device::setValueChanged(StateObjects::VelocityActualValue);
+  Device::setValueChanged(StateObjects::ActualCurrent);
 
   bool value = false;
   if (state_.status_.state() != modm_canopen::cia402::State::OperationEnabled ||
@@ -99,7 +100,8 @@ constexpr void MotorControl<id, Modes...>::registerHandlers(
         const bool valid = (value == int8_t(OperatingMode::Disabled)) ||
                            (value == int8_t(OperatingMode::Voltage)) ||
                            (value == int8_t(OperatingMode::Velocity)) ||
-                           (value == int8_t(OperatingMode::Position));
+                           (value == int8_t(OperatingMode::Position)) ||
+                           (value == int8_t(OperatingMode::Current));
 
         if (valid) {
           auto newMode = (static_cast<OperatingMode>(value));
@@ -142,6 +144,10 @@ constexpr void MotorControl<id, Modes...>::registerHandlers(
 
   map.template setReadHandler<StateObjects::OutputPWM>(
       +[]() { return state_.outputPWM_; });
+
+  map.template setReadHandler<StateObjects::ActualCurrent>(+[]() {
+    return state_.actualCurrent_ - CurrentControl<id>::zeroAverage_.getValue();
+  });
 
   map.template setReadHandler<StateObjects::PositionFactorNumerator>(
       +[]() { return state_.scalingFactors_.position.numerator; });
@@ -202,6 +208,21 @@ constexpr void MotorControl<id, Modes...>::registerHandlers(
 
   map.template setWriteHandler<StateObjects::Polarity>(+[](uint8_t value) {
     state_.scalingFactors_.setPolarity(value);
+    return SdoErrorCode::NoError;
+  });
+  map.template setReadHandler<StateObjects::MaxCurrent>(
+      +[]() { return state_.maxCurrent_; });
+
+  map.template setWriteHandler<StateObjects::MaxCurrent>(+[](float value) {
+    state_.maxCurrent_ = value;
+    return SdoErrorCode::NoError;
+  });
+
+  map.template setReadHandler<StateObjects::MaxCharge>(
+      +[]() { return state_.maxCharge_; });
+
+  map.template setWriteHandler<StateObjects::MaxCharge>(+[](float value) {
+    state_.maxCharge_ = value;
     return SdoErrorCode::NoError;
   });
 

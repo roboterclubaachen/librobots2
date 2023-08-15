@@ -27,8 +27,8 @@ bool VelocityProtocol<id>::update(MotorState &state, MessageCallback &&) {
   if (commandedVelocity_ == 0) {
     state.outputPWM_ = 0;
   } else {
-    state.outputPWM_ =
-        VelocityControl<id>::doVelocityUpdate(commandedVelocity_, state);
+    state.outputPWM_ = VelocityControl<id>::template doVelocityUpdate<Device>(
+        commandedVelocity_, state);
   }
 
   state.status_.setBit<StatusBits::TargetReached>(
@@ -49,7 +49,8 @@ constexpr void VelocityProtocol<id>::registerHandlers(
     modm_canopen::HandlerMap<ObjectDictionary> &map) {
   using modm_canopen::SdoErrorCode;
   map.template setReadHandler<VelocityObjects::VelocityDemandValue>(+[]() {
-    return state.scalingFactors_.velocity.toUser(commandedVelocity_);
+    return state.scalingFactors_.velocity.toUser(
+        VelocityControl<id>::commandedVel_);
   });
 
   map.template setReadHandler<VelocityObjects::VelocityError>(+[]() {

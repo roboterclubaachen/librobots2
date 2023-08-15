@@ -1,21 +1,21 @@
-#ifndef VELOCITY_PROTOCOL_HPP
-#define VELOCITY_PROTOCOL_HPP
+#ifndef CURRENT_PROTOCOL_HPP
+#define CURRENT_PROTOCOL_HPP
 #include <cstdint>
 #include <limits>
 
-#include "motor_state.hpp"
-#include "velocity_control.hpp"
 #include <modm-canopen/device/canopen_device.hpp>
 #include <modm-canopen/object_dictionary.hpp>
 
-template <size_t id> class VelocityProtocol {
+#include "current_control.hpp"
+#include "motor_state.hpp"
+
+template <size_t id> class CurrentProtocol {
 public:
-  static inline int32_t receivedVelocity_{};
-  static inline int32_t commandedVelocity_{};
+  static inline float targetCurrent_{};
 
   static bool applicable(const MotorState &state) {
-    VelocityControl<id>::resetIfApplicable(state);
-    return state.mode_ == OperatingMode::Velocity &&
+    CurrentControl<0>::resetIfApplicable(state);
+    return state.mode_ == OperatingMode::Current &&
            state.status_.state() ==
                modm_canopen::cia402::State::OperationEnabled;
   }
@@ -32,5 +32,5 @@ public:
                              MessageCallback &&) {}
 };
 
-#include "velocity_protocol_impl.hpp"
+#include "current_protocol_impl.hpp"
 #endif
