@@ -63,11 +63,11 @@ int16_t CurrentControl<id>::update(float inCurrent, const MotorState &state) {
   if (std::abs(commandedCurrent_) < 0.05f)
     return 0;
 
-  currentPid_.update(currentError_, isLimiting_);
+  currentPid_.update(currentError_, false);
+  const auto output = std::clamp(currentPid_.getValue(), -1.0f, 1.0f) *
+                      std::numeric_limits<int16_t>::max();
 
-  return (int16_t)(std::clamp(
-      currentPid_.getValue(), (float)std::numeric_limits<int16_t>::min(),
-      (float)std::numeric_limits<int16_t>::max())); // * rampMultiplier_;
+  return (int16_t)output * rampMultiplier_;
 }
 
 template <size_t id>
