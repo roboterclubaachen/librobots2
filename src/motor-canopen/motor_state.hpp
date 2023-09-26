@@ -13,7 +13,6 @@ using StateMachine = modm_canopen::cia402::StateMachine;
 using ControlWord = modm_canopen::cia402::CommandWord;
 using Factors = modm_canopen::cia402::Factors;
 
-
 struct MotorState {
   OperatingMode mode_{OperatingMode::Disabled};
   StateMachine status_{modm_canopen::cia402::State::SwitchOnDisabled};
@@ -28,7 +27,7 @@ struct MotorState {
 
   float actualCurrent_{};
   float maxCurrent_{2.0f};
-  float maxCharge_{0.1f};
+  float maxCharge_{0.5f};
 
   modm::filter::MovingAverage<int32_t, 16> actualVelocity_{};
 
