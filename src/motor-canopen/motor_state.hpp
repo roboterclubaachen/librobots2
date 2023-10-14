@@ -28,8 +28,8 @@ struct MotorState {
   float orientedCurrent_{};
   float unorientedCurrent_{};
   float orientedCurrentAngle_{};
-  float maxCurrent_{2.0f};
-  float maxCharge_{0.5f};
+  float maxCurrent_{3.0f};
+  float maxCharge_{400.0f};
 
   modm::filter::MovingAverage<int32_t, 16> actualVelocity_{};
 
