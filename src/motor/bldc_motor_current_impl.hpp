@@ -8,44 +8,32 @@ namespace librobots2::motor {
 
 template <size_t n>
 void BldcMotorCurrent<n>::updateCurrentAverage(float alpha, float beta) {
-  alpha_.update(alpha);
-  beta_.update(beta);
+  auto magn = std::sqrt(alpha * alpha + beta * beta);
+  auto angl = std::atan2(alpha, beta);
+  magnitude_.update(magn);
+  if (hasLast) {
+    auto angleDiff = angl - lastAngle_;
+    angleDiff = std::fmod(angleDiff + std::numbers::pi_v<float>,
+                          2.0f * std::numbers::pi_v<float>);
+    if (angleDiff <= 0.0f)
+      angleDiff = angleDiff + std::numbers::pi_v<float>;
+    else
+      angleDiff = angleDiff - std::numbers::pi_v<float>;
+    angleDiff_.update(angleDiff);
+  }
+  hasLast = true;
+  lastAngle_ = angl;
 }
 
 template <size_t n> float BldcMotorCurrent<n>::getMagnitude() const {
-  auto val_a = alpha_.getValue();
-  val_a = val_a * val_a;
-  auto val_b = beta_.getValue();
-  val_b = val_b * val_b;
-  return std::sqrt(val_a + val_b);
-}
-
-template <size_t n> float BldcMotorCurrent<n>::getAngle() const {
-  auto val_a = alpha_.getValue();
-  auto val_b = beta_.getValue();
-  return std::atan2(val_a, val_b);
-}
-
-template <size_t n> void BldcMotorCurrent<n>::goToNextAverage() {
-  lastMagnitude_ = getMagnitude();
-  lastAngle_ = getAngle();
-  hasLast_ = true;
+  return magnitude_.getValue();
 }
 
 template <size_t n> float BldcMotorCurrent<n>::getAngleDifference() const {
-  if (!hasLast_)
-    return 0.0f;
-  auto angleDiff = getAngle() - lastAngle_;
-  angleDiff = std::fmod(angleDiff + std::numbers::pi_v<float>,
-                        2.0 * std::numbers::pi_v<float>);
-  if (angleDiff <= 0.0)
-    return angleDiff + std::numbers::pi_v<float>;
-  return angleDiff - std::numbers::pi_v<float>;
+  return angleDiff_.getValue();
 }
 
 template <size_t n> float BldcMotorCurrent<n>::getOrientedCurrent() const {
-  if (hasLast_)
-    return 0.0f;
   if (getAngleDifference() < 0.0f) {
     return -getMagnitude();
   }

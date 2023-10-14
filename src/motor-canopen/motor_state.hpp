@@ -28,7 +28,7 @@ struct MotorState {
 
   float orientedCurrent_{};
   float unorientedCurrent_{};
-  float orientedCurrentAngle_{};
+  float orientedCurrentAngleDiff_{};
   float maxCurrent_{3.0f};
 
   static constexpr uint16_t zeroAverageCountdownReset_{256};

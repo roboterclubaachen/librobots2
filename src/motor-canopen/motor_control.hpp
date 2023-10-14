@@ -39,8 +39,8 @@ public:
     state_.orientedCurrent_ = current;
   }
 
-  static inline void setOrientedCurrentAngle(float angle) {
-    state_.orientedCurrentAngle_ = angle;
+  static inline void setOrientedCurrentAngleDiff(float angle) {
+    state_.orientedCurrentAngleDiff_ = angle;
   }
 
   static inline void setUnorientedCurrent(float current) {

@@ -70,7 +70,7 @@ bool MotorControl<id, Modes...>::update(MessageCallback &&cb) {
   Device::setValueChanged(StateObjects::VelocityActualValue);
   Device::setValueChanged(StateObjects::PositionInternalValue);
   Device::setValueChanged(StateObjects::PositionActualValue);
-  Device::setValueChanged(StateObjects::OrientedCurrentAngle);
+  Device::setValueChanged(StateObjects::OrientedCurrentAngleDiff);
   Device::setValueChanged(StateObjects::UnorientedCurrent);
   Device::setValueChanged(StateObjects::OrientedCurrent);
 
@@ -248,8 +248,8 @@ constexpr void MotorControl<id, Modes...>::registerHandlers(
   map.template setReadHandler<StateObjects::OrientedCurrent>(
       +[]() { return state_.orientedCurrent_; });
 
-  map.template setReadHandler<StateObjects::OrientedCurrentAngle>(
-      +[]() { return state_.orientedCurrentAngle_; });
+  map.template setReadHandler<StateObjects::OrientedCurrentAngleDiff>(
+      +[]() { return state_.orientedCurrentAngleDiff_; });
 
   map.template setReadHandler<StateObjects::CurrentCharge>(
       +[]() { return state_.currentCharge_; });
