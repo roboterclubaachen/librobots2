@@ -13,8 +13,6 @@ int16_t VelocityControl<id>::doVelocityUpdate(int32_t inVelocity,
       (state.actualVelocity_.getValue() != 0 && commandedVel_ != 0)) {
     reset();
   }
-  if (std::abs(commandedVel_) < 64) // deadband because we oscillate otherwise
-    commandedVel_ = 0;
   if ((std::signbit(commandedVel_) ==
        std::signbit(state.actualVelocity_.getValue())) ||
       (state.actualVelocity_.getValue() == 0 && commandedVel_ != 0)) {
