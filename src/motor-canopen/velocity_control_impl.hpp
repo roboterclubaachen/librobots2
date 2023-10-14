@@ -2,17 +2,19 @@
 #error "Do not include this file directly, use velocity_control.hpp instead"
 #endif
 
-
 template <size_t id>
 template <typename Device>
 int16_t VelocityControl<id>::doVelocityUpdate(int32_t inVelocity,
                                               const MotorState &state) {
 
-  if (std::signbit(commandedVel_) != std::signbit(inVelocity) &&
-      (inVelocity != 0 && commandedVel_ != 0)) {
+  commandedVel_ = inVelocity;
+  if (std::signbit(commandedVel_) !=
+          std::signbit(state.actualVelocity_.getValue()) &&
+      (state.actualVelocity_.getValue() != 0 && commandedVel_ != 0)) {
     reset();
   }
-  commandedVel_ = inVelocity;
+  if (std::abs(commandedVel_) < 64) // deadband because we oscillate otherwise
+    commandedVel_ = 0;
   if ((std::signbit(commandedVel_) ==
        std::signbit(state.actualVelocity_.getValue())) ||
       (state.actualVelocity_.getValue() == 0 && commandedVel_ != 0)) {

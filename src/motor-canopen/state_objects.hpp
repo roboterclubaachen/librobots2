@@ -1,4 +1,4 @@
-#pragma once 
+#pragma once
 #include <modm-canopen/object_dictionary_common.hpp>
 
 struct StateObjects {
@@ -17,9 +17,12 @@ struct StateObjects {
   static constexpr modm_canopen::Address VelocityActualValue{0x606C,
                                                              0}; // User units
 
-  static constexpr modm_canopen::Address ActualCurrent{0x2013, 0}; // Custom
-  static constexpr modm_canopen::Address MaxCurrent{0x2011, 0};    // Custom
-  static constexpr modm_canopen::Address MaxCharge{0x2015, 0};     // Custom
+  static constexpr modm_canopen::Address UnorientedCurrent{0x2013, 0}; // Custom
+  static constexpr modm_canopen::Address OrientedCurrent{0x2019, 0};   // Custom
+  static constexpr modm_canopen::Address OrientedCurrentAngle{0x2020,
+                                                              0}; // Custom
+  static constexpr modm_canopen::Address MaxCurrent{0x2011, 0};   // Custom
+  static constexpr modm_canopen::Address MaxCharge{0x2015, 0};    // Custom
 
   static constexpr modm_canopen::Address OutputPWM{0x2003, 0}; // Custom
   static constexpr modm_canopen::Address Reset{0x2007, 0};     // Set 1/0

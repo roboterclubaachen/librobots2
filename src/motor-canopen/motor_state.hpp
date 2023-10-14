@@ -25,7 +25,9 @@ struct MotorState {
   int32_t actualPosition_{};
   int32_t lastPosition_{};
 
-  float actualCurrent_{};
+  float orientedCurrent_{};
+  float unorientedCurrent_{};
+  float orientedCurrentAngle_{};
   float maxCurrent_{2.0f};
   float maxCharge_{0.5f};
 
@@ -33,6 +35,9 @@ struct MotorState {
 
   bool enableMotor_{true};
   bool resetMotor_{false};
+
+  modm::Clock::time_point lastExecute_;
+  modm::Clock::duration lastExecutionTime_;
 
   int16_t outputPWM_{};
 };

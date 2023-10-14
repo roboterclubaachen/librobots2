@@ -1,12 +1,12 @@
 #ifndef CURRENT_CONTROL_HPP
 #define CURRENT_CONTROL_HPP
+#include "current_objects.hpp"
 #include "motor_state.hpp"
 #include <cstdlib>
 #include <modm/container/deque.hpp>
 #include <modm/math/filter/moving_average.hpp>
 #include <modm/math/filter/pid.hpp>
 #include <modm/processing/timer.hpp>
-#include "current_objects.hpp"
 
 using Pid = modm::Pid<float>;
 
@@ -20,7 +20,6 @@ public:
   static inline float currentCharge_{};
   static inline bool isLimiting_{false};
   static inline float filteredActualCurrent_{0.0f};
-  static inline modm::Clock::time_point lastExecute_{modm::Clock::now()};
   static inline modm::BoundedDeque<std::pair<float, float>, 256>
       currentValues_{};
   static constexpr uint16_t zeroAverageCountdownReset_{256};

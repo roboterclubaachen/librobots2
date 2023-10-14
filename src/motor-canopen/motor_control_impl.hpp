@@ -49,10 +49,12 @@ bool MotorControl<id, Modes...>::update(MessageCallback &&cb) {
       newVelocity_ *
       1024); // Increase velocity resolution for better regulation
 
+  Device::setValueChanged(StateObjects::VelocityActualValue);
   Device::setValueChanged(StateObjects::PositionInternalValue);
   Device::setValueChanged(StateObjects::PositionActualValue);
-  Device::setValueChanged(StateObjects::VelocityActualValue);
-  Device::setValueChanged(StateObjects::ActualCurrent);
+  Device::setValueChanged(StateObjects::OrientedCurrentAngle);
+  Device::setValueChanged(StateObjects::UnorientedCurrent);
+  Device::setValueChanged(StateObjects::OrientedCurrent);
 
   bool value = false;
   if (state_.status_.state() != modm_canopen::cia402::State::OperationEnabled ||
@@ -145,9 +147,8 @@ constexpr void MotorControl<id, Modes...>::registerHandlers(
   map.template setReadHandler<StateObjects::OutputPWM>(
       +[]() { return state_.outputPWM_; });
 
-  map.template setReadHandler<StateObjects::ActualCurrent>(+[]() {
-    return state_.actualCurrent_ - CurrentControl<id>::zeroAverage_.getValue();
-  });
+  map.template setReadHandler<StateObjects::UnorientedCurrent>(
+      +[]() { return state_.unorientedCurrent_; });
 
   map.template setReadHandler<StateObjects::PositionFactorNumerator>(
       +[]() { return state_.scalingFactors_.position.numerator; });
@@ -225,6 +226,12 @@ constexpr void MotorControl<id, Modes...>::registerHandlers(
     state_.maxCharge_ = value;
     return SdoErrorCode::NoError;
   });
+
+  map.template setReadHandler<StateObjects::OrientedCurrent>(
+      +[]() { return state_.orientedCurrent_; });
+
+  map.template setReadHandler<StateObjects::OrientedCurrentAngle>(
+      +[]() { return state_.orientedCurrentAngle_; });
 
   (Modes::template registerHandlers<ObjectDictionary, state_>(map), ...);
 }

@@ -36,7 +36,16 @@ public:
   }
 
   static inline void setOrientedCurrent(float current) {
-    state_.actualCurrent_ = current;
+    state_.orientedCurrent_ = current;
+  }
+
+  static inline void setOrientedCurrentAngle(float angle) {
+    state_.orientedCurrentAngle_ = angle;
+  }
+
+  static inline void setUnorientedCurrent(float current) {
+
+    state_.unorientedCurrent_ = current;
   }
 
   static inline int16_t outputPWM() { return state_.outputPWM_; }

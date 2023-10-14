@@ -8,10 +8,9 @@ template <size_t id>
 template <typename Device>
 int16_t CurrentControl<id>::update(float inCurrent, const MotorState &state) {
   isLimiting_ = false;
-  const auto now = modm::Clock::now();
-  const auto timeSinceLastExecute = now - lastExecute_;
-  const float secondsSinceLastExecute = timeSinceLastExecute.count() / 1000.0f;
-  lastExecute_ = now;
+  const float secondsSinceLastExecute = state.updateTime_.getValue() / 1000.0f;
+
+  // Update soft start ramp
   if (rampMultiplier_ < 1.0f) {
     rampMultiplier_ += rampIncrement_;
   }
@@ -19,13 +18,9 @@ int16_t CurrentControl<id>::update(float inCurrent, const MotorState &state) {
     rampMultiplier_ = 1.0f;
   }
 
-  if (std::signbit(inCurrent) != std::signbit(filteredActualCurrent_)) {
-    currentPid_.reset();
-  }
-
   // Copy sign of in current to actual Current
-  filteredActualCurrent_ =
-      std::copysign(state.actualCurrent_ - zeroAverage_.getValue(), inCurrent);
+  filteredActualCurrent_ = std::copysign(
+      state.unorientedCurrent_ - zeroAverage_.getValue(), inCurrent);
   Device::setValueChanged(CurrentObjects::FilteredActualCurrent);
 
   // Calculate remaining charge
@@ -35,6 +30,8 @@ int16_t CurrentControl<id>::update(float inCurrent, const MotorState &state) {
   Device::setValueChanged(CurrentObjects::CurrentCharge);
 
   commandedCurrent_ = inCurrent;
+
+  // Do charge limiting
   if (std::abs(currentCharge_) > state.maxCharge_) {
     const auto projectedCharge =
         currentCharge_ + secondsSinceLastExecute * inCurrent;
@@ -42,11 +39,11 @@ int16_t CurrentControl<id>::update(float inCurrent, const MotorState &state) {
         2.0f * state.maxCharge_ - std::abs(projectedCharge);
     const auto percentOfChargeRemaining = toDoubleCharge / state.maxCharge_;
     commandedCurrent_ *= percentOfChargeRemaining * percentOfChargeRemaining;
-  }
 
-  if (std::abs(currentCharge_) > state.maxCharge_ * 2.0f) {
-    isLimiting_ = true;
-    commandedCurrent_ = 0;
+    if (std::abs(currentCharge_) > state.maxCharge_ * 2.0f) {
+      isLimiting_ = true;
+      commandedCurrent_ = 0;
+    }
   }
 
   // Limit to max Current
@@ -59,9 +56,6 @@ int16_t CurrentControl<id>::update(float inCurrent, const MotorState &state) {
 
   currentError_ = commandedCurrent_ - filteredActualCurrent_;
   Device::setValueChanged(CurrentObjects::CurrentError);
-
-  if (std::abs(commandedCurrent_) < 0.05f)
-    return 0;
 
   currentPid_.update(currentError_, false);
   const auto output = std::clamp(currentPid_.getValue(), -1.0f, 1.0f) *
@@ -76,7 +70,7 @@ void CurrentControl<id>::resetIfApplicable(const MotorState &state) {
       std::abs(state.actualVelocity_.getValue()) <= 0.001f) {
     rampMultiplier_ = rampMultiplierReset_;
     if (zeroAverageCountdown_ == 0) {
-      zeroAverage_.update(state.actualCurrent_);
+      zeroAverage_.update(state.unorientedCurrent_);
     } else {
       zeroAverageCountdown_--;
     }
@@ -101,5 +95,4 @@ template <size_t id> float CurrentControl<id>::getCharge() {
 template <size_t id> void CurrentControl<id>::reset() {
   currentPid_.reset();
   currentValues_.clear();
-  lastExecute_ = modm::Clock::now();
 }
