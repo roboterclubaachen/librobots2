@@ -17,18 +17,11 @@ public:
   static inline Pid currentPid_;
   static inline float currentError_{};
   static inline float commandedCurrent_{};
-  static inline float currentCharge_{};
   static inline bool isLimiting_{false};
   static inline float filteredActualCurrent_{0.0f};
-  static inline modm::BoundedDeque<std::pair<float, float>, 256>
-      currentValues_{};
-  static constexpr uint16_t zeroAverageCountdownReset_{256};
-  static inline uint16_t zeroAverageCountdown_{zeroAverageCountdownReset_};
-  static inline modm::filter::MovingAverage<float, 16> zeroAverage_{};
+
   static constexpr float rampMultiplierReset_{0.01f}, rampIncrement_ = 0.01f;
   static inline float rampMultiplier_{rampMultiplierReset_};
-
-  static float getCharge();
 
   template <typename Device>
   static int16_t update(float commandedCurrent, const MotorState &state);

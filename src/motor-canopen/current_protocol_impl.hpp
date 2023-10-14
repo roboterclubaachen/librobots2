@@ -41,9 +41,6 @@ constexpr void CurrentProtocol<id>::registerHandlers(
   map.template setReadHandler<CurrentObjects::CurrentError>(
       +[]() { return CurrentControl<id>::currentError_; });
 
-  map.template setReadHandler<CurrentObjects::CurrentCharge>(
-      +[]() { return CurrentControl<id>::currentCharge_; });
-
   map.template setWriteHandler<CurrentObjects::CurrentPID_kP>(+[](float value) {
     CurrentControl<id>::currentPidParameters_.setKp(value);
     CurrentControl<id>::currentPid_.setParameter(

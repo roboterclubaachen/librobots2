@@ -42,6 +42,24 @@ bool MotorControl<id, Modes...>::update(MessageCallback &&cb) {
   state_.updateTime_.update((now - state_.lastUpdate_).count());
   state_.lastUpdate_ = now;
   Device::setValueChanged(StateObjects::UpdateTime);
+  const float secondsSinceLastExecute = state_.updateTime_.getValue() / 1000.0f;
+
+  if (state_.outputPWM_ == 0 &&
+      std::abs(state_.actualVelocity_.getValue()) <= 0.001f) {
+    if (state_.zeroAverageCountdown_ == 0) {
+      state_.zeroAverage_.update(state_.unorientedCurrent_);
+    } else {
+      state_.zeroAverageCountdown_--;
+    }
+  } else {
+    state_.zeroAverageCountdown_ = state_.zeroAverageCountdownReset_;
+  }
+
+  // Calculate remaining charge
+  state_.currentValues_.appendOverwrite(
+      {std::abs(state_.unorientedCurrent_), secondsSinceLastExecute});
+  state_.currentCharge_ = state_.getCharge();
+  Device::setValueChanged(StateObjects::CurrentCharge);
 
   const auto newVelocity_ = state_.actualPosition_ - state_.lastPosition_;
   state_.lastPosition_ = state_.actualPosition_;
@@ -232,6 +250,9 @@ constexpr void MotorControl<id, Modes...>::registerHandlers(
 
   map.template setReadHandler<StateObjects::OrientedCurrentAngle>(
       +[]() { return state_.orientedCurrentAngle_; });
+
+  map.template setReadHandler<StateObjects::CurrentCharge>(
+      +[]() { return state_.currentCharge_; });
 
   (Modes::template registerHandlers<ObjectDictionary, state_>(map), ...);
 }

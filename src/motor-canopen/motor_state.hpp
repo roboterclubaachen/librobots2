@@ -4,6 +4,7 @@
 #include <modm-canopen/cia402/state_machine.hpp>
 #include <modm-canopen/object_dictionary_common.hpp>
 #include <modm/architecture/interface/clock.hpp>
+#include <modm/container/deque.hpp>
 #include <modm/math/filter/moving_average.hpp>
 
 #include "state_objects.hpp"
@@ -29,7 +30,14 @@ struct MotorState {
   float unorientedCurrent_{};
   float orientedCurrentAngle_{};
   float maxCurrent_{3.0f};
+
+  static constexpr uint16_t zeroAverageCountdownReset_{256};
+  uint16_t zeroAverageCountdown_{zeroAverageCountdownReset_};
+  modm::filter::MovingAverage<float, 16> zeroAverage_{};
+
   float maxCharge_{400.0f};
+  modm::BoundedDeque<std::pair<float, float>, 256> currentValues_{};
+  float currentCharge_{0.0f};
 
   modm::filter::MovingAverage<int32_t, 16> actualVelocity_{};
 
@@ -40,4 +48,6 @@ struct MotorState {
   modm::Clock::duration lastExecutionTime_;
 
   int16_t outputPWM_{};
+
+  float getCharge() const;
 };

@@ -20,27 +20,21 @@ int16_t CurrentControl<id>::update(float inCurrent, const MotorState &state) {
 
   // Copy sign of in current to actual Current
   filteredActualCurrent_ = std::copysign(
-      state.unorientedCurrent_ - zeroAverage_.getValue(), inCurrent);
+      state.unorientedCurrent_ - state.zeroAverage_.getValue(), inCurrent);
   Device::setValueChanged(CurrentObjects::FilteredActualCurrent);
-
-  // Calculate remaining charge
-  currentValues_.appendOverwrite(
-      {std::abs(filteredActualCurrent_), secondsSinceLastExecute});
-  currentCharge_ = getCharge();
-  Device::setValueChanged(CurrentObjects::CurrentCharge);
 
   commandedCurrent_ = inCurrent;
 
   // Do charge limiting
-  if (std::abs(currentCharge_) > state.maxCharge_) {
+  if (std::abs(state.currentCharge_) > state.maxCharge_) {
     const auto projectedCharge =
-        currentCharge_ + secondsSinceLastExecute * inCurrent;
+        state.currentCharge_ + secondsSinceLastExecute * inCurrent;
     const auto toDoubleCharge =
         2.0f * state.maxCharge_ - std::abs(projectedCharge);
     const auto percentOfChargeRemaining = toDoubleCharge / state.maxCharge_;
     commandedCurrent_ *= percentOfChargeRemaining * percentOfChargeRemaining;
 
-    if (std::abs(currentCharge_) > state.maxCharge_ * 2.0f) {
+    if (std::abs(state.currentCharge_) > state.maxCharge_ * 2.0f) {
       isLimiting_ = true;
       commandedCurrent_ = 0;
     }
@@ -69,13 +63,6 @@ void CurrentControl<id>::resetIfApplicable(const MotorState &state) {
   if (state.outputPWM_ == 0 &&
       std::abs(state.actualVelocity_.getValue()) <= 0.001f) {
     rampMultiplier_ = rampMultiplierReset_;
-    if (zeroAverageCountdown_ == 0) {
-      zeroAverage_.update(state.unorientedCurrent_);
-    } else {
-      zeroAverageCountdown_--;
-    }
-  } else {
-    zeroAverageCountdown_ = zeroAverageCountdownReset_;
   }
   if (!state.enableMotor_ ||
       state.status_.state() != modm_canopen::cia402::State::OperationEnabled ||
@@ -84,15 +71,4 @@ void CurrentControl<id>::resetIfApplicable(const MotorState &state) {
   }
 }
 
-template <size_t id> float CurrentControl<id>::getCharge() {
-  float acc = 0.0f;
-  for (auto &pair : currentValues_) {
-    acc += pair.first * pair.second;
-  }
-  return acc;
-}
-
-template <size_t id> void CurrentControl<id>::reset() {
-  currentPid_.reset();
-  currentValues_.clear();
-}
+template <size_t id> void CurrentControl<id>::reset() { currentPid_.reset(); }
