@@ -20,7 +20,7 @@ struct MotorState {
   ControlWord control_{0};
   Factors scalingFactors_{};
 
-  modm::filter::MovingAverage<uint32_t, 32> updateTime_{};
+  modm::filter::MovingAverage<uint32_t, 32> updateTime_us_{};
   modm::chrono::micro_clock::time_point lastUpdate_{};
 
   int32_t actualPosition_{};

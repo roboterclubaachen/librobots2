@@ -38,11 +38,12 @@ void MotorControl<id, Modes...>::processMessage(
 template <size_t id, typename... Modes>
 template <typename Device, typename MessageCallback>
 bool MotorControl<id, Modes...>::update(MessageCallback &&cb) {
-  auto now = modm::chrono::micro_clock::now();
-  state_.updateTime_.update((now - state_.lastUpdate_).count());
+  const auto now = modm::chrono::micro_clock::now();
+  const auto lastUpdateTime_us = (now - state_.lastUpdate_).count();
+  const auto lastUpdateTime_s = (float)lastUpdateTime_us / 1000000.0f;
+  state_.updateTime_us_.update(lastUpdateTime_us);
   state_.lastUpdate_ = now;
   Device::setValueChanged(StateObjects::UpdateTime);
-  const float secondsSinceLastExecute = state_.updateTime_.getValue() / 1000.0f;
 
   if (state_.outputPWM_ == 0 &&
       std::abs(state_.actualVelocity_.getValue()) <= 0.001f) {
@@ -57,15 +58,15 @@ bool MotorControl<id, Modes...>::update(MessageCallback &&cb) {
 
   // Calculate remaining charge
   state_.currentValues_.appendOverwrite(
-      {std::abs(state_.unorientedCurrent_), secondsSinceLastExecute});
+      {std::abs(state_.unorientedCurrent_), lastUpdateTime_s});
   state_.currentCharge_ = state_.getCharge();
   Device::setValueChanged(StateObjects::CurrentCharge);
 
-  const auto newVelocity_ = state_.actualPosition_ - state_.lastPosition_;
+  const auto newVelocity_ =
+      (state_.actualPosition_ - state_.lastPosition_) * lastUpdateTime_us;
   state_.lastPosition_ = state_.actualPosition_;
   state_.actualVelocity_.update(
-      newVelocity_ *
-      1024); // Increase velocity resolution for better regulation
+      newVelocity_); // Increase velocity resolution for better regulation
 
   Device::setValueChanged(StateObjects::VelocityActualValue);
   Device::setValueChanged(StateObjects::PositionInternalValue);
@@ -107,7 +108,7 @@ constexpr void MotorControl<id, Modes...>::registerHandlers(
   });
 
   map.template setReadHandler<StateObjects::UpdateTime>(
-      +[]() { return uint32_t(state_.updateTime_.getValue()); });
+      +[]() { return uint32_t(state_.updateTime_us_.getValue()); });
 
   map.template setReadHandler<StateObjects::ModeOfOperation>(
       +[]() { return int8_t(state_.mode_); });

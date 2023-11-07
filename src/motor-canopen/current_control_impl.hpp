@@ -8,7 +8,7 @@ template <size_t id>
 template <typename Device>
 int16_t CurrentControl<id>::update(float inCurrent, const MotorState &state) {
   isLimiting_ = false;
-  const float secondsSinceLastExecute = state.updateTime_.getValue() / 1000.0f;
+  const float avg_updateTime_s = state.updateTime_us_.getValue() / 1000000.0f;
 
   // Update soft start ramp
   if (rampMultiplier_ < 1.0f) {
@@ -28,7 +28,7 @@ int16_t CurrentControl<id>::update(float inCurrent, const MotorState &state) {
   // Do charge limiting
   if (std::abs(state.currentCharge_) > state.maxCharge_) {
     const auto projectedCharge =
-        state.currentCharge_ + secondsSinceLastExecute * inCurrent;
+        state.currentCharge_ + avg_updateTime_s * inCurrent;
     const auto toDoubleCharge =
         2.0f * state.maxCharge_ - std::abs(projectedCharge);
     const auto percentOfChargeRemaining = toDoubleCharge / state.maxCharge_;
