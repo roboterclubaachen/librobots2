@@ -62,8 +62,8 @@ bool MotorControl<id, Modes...>::update(MessageCallback &&cb) {
   state_.currentCharge_ = state_.getCharge();
   Device::setValueChanged(StateObjects::CurrentCharge);
 
-  const auto newVelocity_ =
-      (state_.actualPosition_ - state_.lastPosition_) * lastUpdateTime_us;
+  const auto newVelocity_ = (state_.actualPosition_ - state_.lastPosition_) *
+                            1000000 / lastUpdateTime_us;
   state_.lastPosition_ = state_.actualPosition_;
   state_.actualVelocity_.update(
       newVelocity_); // Increase velocity resolution for better regulation
