@@ -22,7 +22,7 @@ constexpr void PWMProtocol<id>::registerHandlers(
 
   map.template setWriteHandler<PWMObjects::PWMCommand>(+[](int16_t value) {
     commandedPWM_ = value;
-    MODM_LOG_INFO << "Set commanded PWM to " << commandedPWM_ << modm::endl;
+    // MODM_LOG_INFO << "Set commanded PWM to " << commandedPWM_ << modm::endl;
     return SdoErrorCode::NoError;
   });
 }
