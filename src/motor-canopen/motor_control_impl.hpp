@@ -62,11 +62,13 @@ bool MotorControl<id, Modes...>::update(MessageCallback &&cb) {
   state_.currentCharge_ = state_.getCharge();
   Device::setValueChanged(StateObjects::CurrentCharge);
 
-  const auto newVelocity_ = (state_.actualPosition_ - state_.lastPosition_) *
-                            1000000 / lastUpdateTime_us;
+  const auto newVelocity_ =
+      (float)(state_.actualPosition_ - state_.lastPosition_) * 1000.0f *
+      1000.0f / (float)lastUpdateTime_us;
   state_.lastPosition_ = state_.actualPosition_;
   state_.actualVelocity_.update(
-      newVelocity_); // Increase velocity resolution for better regulation
+      (int32_t)
+          newVelocity_); // Increase velocity resolution for better regulation
 
   Device::setValueChanged(StateObjects::VelocityActualValue);
   Device::setValueChanged(StateObjects::PositionInternalValue);
