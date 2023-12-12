@@ -39,7 +39,8 @@ struct MotorState {
   modm::BoundedDeque<std::pair<float, float>, 256> currentValues_{};
   float currentCharge_{0.0f};
 
-  modm::filter::MovingAverage<int32_t, 16> actualVelocity_{};
+  // TODO calculcate with difference in time between pulses!
+  modm::filter::MovingAverage<int32_t, 512> actualVelocity_{};
 
   bool enableMotor_{true};
   bool resetMotor_{false};
