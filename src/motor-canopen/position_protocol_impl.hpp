@@ -74,9 +74,15 @@ constexpr void PositionProtocol<id>::registerHandlers(
   using modm_canopen::SdoErrorCode;
 
   map.template setReadHandler<PositionObjects::FollowingErrorActualValue>(
-      +[]() { return state.scalingFactors_.position.toUser(positionError_); });
+      +[]() {
+        if (state.mode_ != OperatingMode::Position)
+          return (int32_t)0;
+        return state.scalingFactors_.position.toUser(positionError_);
+      });
 
   map.template setReadHandler<PositionObjects::PositionDemandValue>(+[]() {
+    if (state.mode_ != OperatingMode::Position)
+      return (int32_t)0;
     return state.scalingFactors_.position.toUser(commandedPosition_);
   });
 
@@ -87,8 +93,6 @@ constexpr void PositionProtocol<id>::registerHandlers(
   map.template setWriteHandler<PositionObjects::TargetPosition>(
       +[](int32_t value) {
         receivedPosition_ = state.scalingFactors_.position.toInternal(value);
-        // MODM_LOG_INFO << "Set Target Position to " << receivedPosition_
-        //               << modm::endl;
         return SdoErrorCode::NoError;
       });
 

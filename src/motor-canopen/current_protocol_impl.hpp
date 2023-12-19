@@ -24,11 +24,21 @@ constexpr void CurrentProtocol<id>::registerHandlers(
     modm_canopen::HandlerMap<ObjectDictionary> &map) {
 
   using modm_canopen::SdoErrorCode;
-  map.template setReadHandler<CurrentObjects::CommandedCurrent>(
-      +[]() { return CurrentControl<id>::commandedCurrent_; });
+  map.template setReadHandler<CurrentObjects::CommandedCurrent>(+[]() {
+    if (state.mode_ != OperatingMode::Current &&
+        state.mode_ != OperatingMode::Velocity &&
+        state.mode_ != OperatingMode::Position)
+      return 0.0f;
+    return CurrentControl<id>::commandedCurrent_;
+  });
 
-  map.template setReadHandler<CurrentObjects::FilteredActualCurrent>(
-      +[]() { return CurrentControl<id>::filteredActualCurrent_; });
+  map.template setReadHandler<CurrentObjects::FilteredActualCurrent>(+[]() {
+    if (state.mode_ != OperatingMode::Current &&
+        state.mode_ != OperatingMode::Velocity &&
+        state.mode_ != OperatingMode::Position)
+      return 0.0f;
+    return CurrentControl<id>::filteredActualCurrent_;
+  });
 
   map.template setReadHandler<CurrentObjects::TargetCurrent>(
       +[]() { return targetCurrent_; });
@@ -38,8 +48,13 @@ constexpr void CurrentProtocol<id>::registerHandlers(
     return SdoErrorCode::NoError;
   });
 
-  map.template setReadHandler<CurrentObjects::CurrentError>(
-      +[]() { return CurrentControl<id>::currentError_; });
+  map.template setReadHandler<CurrentObjects::CurrentError>(+[]() {
+    if (state.mode_ != OperatingMode::Current &&
+        state.mode_ != OperatingMode::Velocity &&
+        state.mode_ != OperatingMode::Position)
+      return 0.0f;
+    return CurrentControl<id>::currentError_;
+  });
 
   map.template setWriteHandler<CurrentObjects::CurrentPID_kP>(+[](float value) {
     CurrentControl<id>::currentPidParameters_.setKp(value);
