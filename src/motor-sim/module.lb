@@ -25,7 +25,8 @@ def prepare(module, options):
         "modm:container",
         "modm:platform:core",
         "librobots2:motor",
-        "modm:processing:timer"
+        "modm:processing:timer",
+        "modm:math:geometry"
     )
     return True
 

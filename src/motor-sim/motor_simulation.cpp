@@ -1,172 +1,174 @@
 #include "motor_simulation.hpp"
-#include <cmath>
 #include <limits>
-#include <numbers>
-#include <numeric>
-#include <thread>
-
-using namespace std::literals;
-
 #include <modm/debug/logger.hpp>
+#include <cmath>
 
-void SimMotor::setSupplyVoltage(float v) { supplyVoltage_V = v; }
+namespace librobots2::motor_sim
+{
 
-float SimMotor::getRotorAcc() const { return state.shaft_acceleration_rad_s2; }
-
-float SimMotor::getRotorVel() const { return state.shaft_speed_rad_s; }
-
-float SimMotor::getRotorPos() const { return state.shaft_angle_rad; }
-
-float SimMotor::getPhaseCurrent(Phase phase) const {
-  return state.phaseCurrent_a[getPhaseIndex(phase)];
+double
+MotorSimulation::angleMod(double angle)
+{
+	angle = std::fmod(angle, M_PI * 2);
+	if (angle < 0.0)
+	{
+		angle += M_PI * 2;
+		angle = std::fmod(angle, M_PI * 2);
+	}
+	return angle;
 }
 
-void SimMotor::setPhasePWM(Phase phase, uint16_t pwm) {
-  const auto phaseIndex = getPhaseIndex(phase);
-  state.phasePWM[phaseIndex] = pwm;
+modm::Vector3f
+MotorSimulation::emfFunction(double rotor_p)
+{
+	// Switching Pattern-Independent Simulation Model for Brushless DC Motors (Kang et al. 2011)
+	auto out = modm::Vector3f();
+	for (size_t i = 0; i < 3; i++)
+	{
+		rotor_p = angleMod(rotor_p);
+		if (0 <= rotor_p && rotor_p < M_PI / 6)
+		{
+			out[i] = rotor_p * 6 / M_PI;
+		} else if (M_PI / 6 <= rotor_p && rotor_p < 5 * M_PI / 6)
+		{
+			out[i] = 1;
+		} else if (5 * M_PI / 6 <= rotor_p && rotor_p < 7 * M_PI / 6)
+		{
+			out[i] = (M_PI - rotor_p) * 6 / M_PI;
+		} else if (7 * M_PI / 6 <= rotor_p && rotor_p < 11 * M_PI / 6)
+		{
+			out[i] = -1;
+		} else if (11 * M_PI / 6 <= rotor_p && rotor_p < 2 * M_PI)
+		{
+			out[i] = (rotor_p - 2 * M_PI) * 6 / M_PI;
+		}
+		rotor_p += M_PI * 4.0 / 3.0;
+	}
+	return -out;
 }
 
-uint8_t SimMotor::getPhaseIndex(Phase phase) {
-  uint8_t phaseIndex = 0;
-  switch (phase) {
-  case Phase::PhaseU:
-    break;
-  case Phase::PhaseV:
-    phaseIndex = 1;
-    break;
-  case Phase::PhaseW:
-    phaseIndex = 2;
-    break;
-  default: // TODO support more than 3 phases?
-    break;
-  }
-  return phaseIndex;
+modm::Vector3f
+MotorSimulation::computeVoltages(double v, const std::array<float, 3>& pwms,
+								 const std::array<PhaseConfig, 3>& config,
+								 const modm::Vector3f& bemf)
+{
+	size_t acc{0};
+	double center{0.0};
+	modm::Vector3f voltages{0, 0, 0};
+
+	// At this point we technically compute potentials
+	for (size_t i = 0; i < config.size(); i++)
+	{
+		float mult = 0.0f;
+		switch (config[i])
+		{
+			case PhaseConfig::HiZ:
+				break;
+			case PhaseConfig::Low:
+				mult = -1.0f;
+				break;
+			case PhaseConfig::High:
+				mult = 1.0f;
+				break;
+			case PhaseConfig::Pwm:
+				mult = pwms[i];
+				break;
+		}
+		voltages[i] =
+			v / 2 * mult;  // Set outside points to +-half VDC depending if Gate is high or low
+		if (config[i] != PhaseConfig::HiZ)
+		{
+			acc++;
+			center += voltages[i] - bemf[i];  // Add bemf subtracted voltage to midpoint
+		}
+	}
+	center /= acc;  // Compute center voltage
+
+	// Make voltages relative to center
+	for (size_t i = 0; i < config.size(); i++)
+	{
+		if (config[i] == PhaseConfig::HiZ)
+		{
+			voltages[i] = bemf[i];
+		} else
+		{
+			voltages[i] -= center;
+		}
+	}
+	return voltages;
 }
 
-float SimMotor::getDampingTorque_kg_m(float linear_damping_kg_m_s_rad,
-                                      float shaft_speed_rad_s) {
-  return linear_damping_kg_m_s_rad * shaft_speed_rad_s;
+MotorState
+MotorSimulation::nextState(const std::array<float, 3>& pwms,
+						   const std::array<PhaseConfig, 3>& config, double timestep)
+{
+	// Trapezoidal function
+	const auto emf_factor = emfFunction(state_.theta_e);
+
+	// Actual back emf voltages
+	const auto e = emf_factor * data_.k_e * state_.omega_m;
+
+	// Phase voltages
+	const auto v = computeVoltages(data_.vdc, pwms, config, e);
+
+	// Phase Currents
+	const auto d_i = (v - data_.r_s * state_.i - e) / (data_.l - data_.m);
+	const auto i = state_.i + d_i * timestep;
+
+	// Torque
+	const auto t_e = (emf_factor * state_.i) * data_.k_e;
+
+	// Linear friction
+	const auto t_f = data_.f * state_.omega_m;
+
+	// Mechanics
+	const auto d_omega_m = (t_e - state_.t_l - t_f) / data_.j;
+	const auto omega_m = state_.omega_m + d_omega_m * timestep;
+	const auto theta_m = angleMod(state_.theta_m + state_.omega_m * timestep);
+	const auto theta_e = angleMod(theta_m * data_.p / 2);
+
+	// Create new state object
+	MotorState out{};
+	out.e = e;
+	out.i = i;
+	out.v = v;
+	out.omega_m = omega_m;
+	out.theta_m = theta_m;
+	out.theta_e = theta_e;
+	out.t_e = t_e;
+	out.t_f = t_f;
+	out.t_l = state_.t_l;
+	return out;
 }
 
-float SimMotor::getDetentTorque_kg_m(float detent_torque_kg_m,
-                                     uint8_t num_stator_phases,
-                                     uint8_t num_rotor_poles,
-                                     float shaft_position_rad) {
-
-  return detent_torque_kg_m *
-         std::sin(num_stator_phases * num_rotor_poles * shaft_position_rad);
+void
+MotorSimulation::update(double timestep)
+{
+	state_ = nextState(MotorBridge::getPWMs(), MotorBridge::getConfig(), timestep);
+	updateHallPort();
 }
 
-float SimMotor::applyDrag_kg_m(float phaseTorque_kg_m, float drag_kg_m) {
-  if (phaseTorque_kg_m >= 0.0f) {
-    if (phaseTorque_kg_m < drag_kg_m) {
-      return 0.0f;
-    }
-    return phaseTorque_kg_m - drag_kg_m;
-  } else {
-    if (phaseTorque_kg_m > -drag_kg_m) {
-      return 0.0f;
-    }
-    return phaseTorque_kg_m + drag_kg_m;
-  }
+double
+MotorSimulation::maxCurrent()
+{
+
+	return std::max(std::max(std::abs(state_.i[0]), std::abs(state_.i[1])), std::abs(state_.i[2]));
 }
 
-void SimMotor::update(float timestep_s) {
-  for (size_t i = 0; i < phaseCount; i++) {
-    state.forwardVoltage_V[i] =
-        computePhaseVoltage_V(i, supplyVoltage_V, state, properties);
-    state.backEMF_V[i] = computeBackEMF_V(i, state, properties);
-    state.phaseCurrent_a[i] =
-        computePhaseCurrent_a(i, timestep_s, state, properties);
-  }
+void
+MotorSimulation::updateHallPort()
+{
+	const auto index = ((unsigned int)std::round(angleMod(state_.theta_e) * 6 / (2 * M_PI))) % 6;
 
-  state.electricTorque_kg_m = computeElectricTorque_kg_m(state);
-  state.shaft_acceleration_rad_s2 =
-      computeAcceleration_rad_s2(state, properties);
-  state.shaft_speed_rad_s += getRotorAcc() * timestep_s;
-  state.shaft_angle_rad += getRotorVel() * timestep_s;
-
-  MODM_LOG_INFO << state.electricTorque_kg_m << ":"
-                << state.shaft_acceleration_rad_s2 << ":" << modm::endl;
-  std::this_thread::sleep_for(100ms);
-}
-void SimMotor::setPhaseConfig(Phase phase, PhaseConfig config) {
-  const auto phaseIndex = getPhaseIndex(phase);
-  state.phaseConfigs[phaseIndex] = config;
+	Pin<0>::set(index == 5 || index == 0 || index == 1);
+	Pin<1>::set(index == 1 || index == 2 || index == 3);
+	Pin<2>::set(index == 3 || index == 4 || index == 5);
 }
 
-float SimMotor::computePhaseVoltage_V(uint8_t phaseIndex, float supplyVoltage_V,
-                                      const MotorState_t<phaseCount> &state,
-                                      const MotorProperties &properties) {
-  float phasePotentialIn_V = 0.0f;
-  switch (state.phaseConfigs[phaseIndex]) {
-  case PhaseConfig::HiZ:
-    // TODO implement?
-    break;
-  case PhaseConfig::Low:
-    break;
-  case PhaseConfig::High:
-    phasePotentialIn_V = supplyVoltage_V;
-    break;
-  case PhaseConfig::Pwm:
-    phasePotentialIn_V = supplyVoltage_V * (float)state.phasePWM[phaseIndex] /
-                         (float)std::numeric_limits<uint16_t>::max();
-    break;
-  }
-  return phasePotentialIn_V;
+MotorState&
+MotorSimulation::state()
+{
+	return state_;
 }
 
-float SimMotor::computeBackEMF_V(uint8_t phaseIndex,
-                                 const MotorState_t<phaseCount> &state,
-                                 const MotorProperties &properties) {
-  const auto phaseOffset = 2 * std::numbers::pi_v<float> / phaseCount;
-  const auto factor =
-      std::sin(state.shaft_angle_rad - phaseIndex * phaseOffset);
-  const auto backEMF_V =
-      -state.shaft_speed_rad_s * properties.back_emf_constant_v_s_rad * factor;
-  return backEMF_V;
-}
-
-float SimMotor::computePhaseCurrent_a(uint8_t phaseIndex, float timestep_s,
-                                      const MotorState_t<phaseCount> &state,
-                                      const MotorProperties &properties) {
-  const float inductance_factor =
-      1 / (properties.phaseInductance_h - properties.phaseInductance_h *
-                                              properties.phaseInductance_h *
-                                              properties.phaseCouplingFactor);
-  const float resistanceDrop_V =
-      properties.phaseResistance_Ohm * state.phaseCurrent_a[phaseIndex];
-
-  const float currentChange_a_s =
-      inductance_factor * (state.forwardVoltage_V[phaseIndex] -
-                           resistanceDrop_V + state.backEMF_V[phaseIndex]);
-  return state.phaseCurrent_a[phaseIndex] + currentChange_a_s * timestep_s;
-}
-
-float SimMotor::computeElectricTorque_kg_m(
-    const MotorState_t<phaseCount> &state) {
-  float value = 0.0f;
-  for (size_t i = 0; i < phaseCount; i++) {
-    value += state.phaseCurrent_a[i] * state.backEMF_V[i];
-  }
-  if (state.shaft_speed_rad_s != 0.0f) {
-    value /= state.shaft_speed_rad_s;
-  } else {
-    return 0.0f;
-  }
-  return value;
-}
-
-float SimMotor::computeAcceleration_rad_s2(
-    const MotorState_t<phaseCount> &state, const MotorProperties &properties) {
-  const float torque_kg_m =
-      state.electricTorque_kg_m -
-      getDampingTorque_kg_m(properties.lin_damping_kg_m_s_rad,
-                            state.shaft_speed_rad_s) -
-      getDetentTorque_kg_m(properties.detent_torque_kg_m,
-                           properties.num_stator_phases,
-                           properties.num_rotor_poles, state.shaft_angle_rad);
-  const float dragged_torque_kg_m =
-      applyDrag_kg_m(torque_kg_m, properties.const_damping_kg_m);
-  return dragged_torque_kg_m / properties.inertia_kg_m_s2_rad;
-}
+}  // namespace librobots2::motor_sim
