@@ -129,7 +129,7 @@ MotorSimulation::nextState(const std::array<float, 3>& pwms,
 	// Mechanical torque
 	const auto t_m = t_e - state_.t_l - t_f;
 
-	const bool isFrictionOnly = (t_e - state_.t_l < 0.00001f);
+	const bool isFrictionOnly = (std::abs(t_e - state_.t_l) < 0.00001f);
 
 	// Mechanics
 	auto d_omega_m = t_m / data_.j;
