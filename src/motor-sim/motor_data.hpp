@@ -14,8 +14,9 @@ struct MotorData
 	uint8_t p{6};               // Number of pole pairs
 	double vdc{2 * 10 * M_PI};  // Supply voltage
 
-	double j{0.0001};  // Inertia
-	double f{0.001};   // Friction
+	double j{0.0001};   // Inertia
+	double f_l{0.001};  // Linear Friction
+	double f_s{0.01};   // Static Friction
 };
 
 }  // namespace librobots2::motor_sim
