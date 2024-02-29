@@ -70,9 +70,7 @@ MotorSimulation::computeVoltages(double v, const std::array<float, 3>& pwms,
 		switch (config[i])
 		{
 			case PhaseConfig::HiZ:
-				break;
 			case PhaseConfig::Low:
-				mult = -1.0f;
 				break;
 			case PhaseConfig::High:
 				mult = 1.0f;
@@ -82,7 +80,7 @@ MotorSimulation::computeVoltages(double v, const std::array<float, 3>& pwms,
 				break;
 		}
 		voltages[i] =
-			v / 2 * mult;  // Set outside points to +-half VDC depending if Gate is high or low
+			v * mult;  // Set outside points to +-half VDC depending if Gate is high or low
 		if (config[i] != PhaseConfig::HiZ)
 		{
 			acc++;
