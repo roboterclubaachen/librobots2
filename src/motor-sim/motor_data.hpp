@@ -16,7 +16,7 @@ struct MotorData
 
 	double j{0.0001};   // Inertia
 	double f_l{0.001};  // Linear Friction
-	double f_s{0.01};   // Static Friction
+	double f_s{0.1};    // Static Friction
 };
 
 }  // namespace librobots2::motor_sim

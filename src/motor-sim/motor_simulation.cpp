@@ -123,22 +123,26 @@ MotorSimulation::nextState(const std::array<float, 3>& pwms,
 	// Torque
 	const auto t_e = (emf_factor * state_.i) * data_.k_e;
 
-	// Linear friction
-	const auto t_f = data_.f_l * state_.omega_m;
+	// Friction torque
+	const auto t_f = ((state_.omega_m < 0.001f) ? data_.f_s : data_.f_l) * state_.omega_m;
 
 	// Mechanical torque
-	auto t_m = t_e - state_.t_l - t_f;
-	if (std::abs(t_m) > std::abs(data_.f_s))
-	{
-		t_m -= std::copysign(data_.f_s, t_m);
-	} else
-	{
-		t_m = 0.0f;
-	}
+	const auto t_m = t_e - state_.t_l - t_f;
+
+	const bool isFrictionOnly = (t_e - state_.t_l < 0.00001f);
 
 	// Mechanics
-	const auto d_omega_m = t_m / data_.j;
-	const auto omega_m = state_.omega_m + d_omega_m * timestep;
+	auto d_omega_m = t_m / data_.j;
+	auto omega_m = state_.omega_m + d_omega_m * timestep;
+
+	// Come to a complete stop if we are very slow
+	if (isFrictionOnly &&
+		(std::signbit(omega_m) != std::signbit(state_.omega_m) || omega_m < 0.00001f))
+	{
+		d_omega_m = -state_.omega_m / timestep;
+		omega_m = 0.0f;
+	}
+
 	const auto theta_m = angleMod(state_.theta_m + state_.omega_m * timestep);
 	const auto theta_e = angleMod(theta_m * data_.p / 2);
 
