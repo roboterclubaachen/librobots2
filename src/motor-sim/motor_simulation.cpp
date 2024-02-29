@@ -6,6 +6,13 @@
 namespace librobots2::motor_sim
 {
 
+void
+MotorSimulation::initialize(const MotorData& motor)
+{
+	data_ = motor;
+	state_ = {};
+}
+
 double
 MotorSimulation::angleMod(double angle)
 {

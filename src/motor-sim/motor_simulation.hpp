@@ -9,7 +9,7 @@ namespace librobots2::motor_sim
 class MotorSimulation
 {
 private:
-	static inline const MotorData data_{};
+	static inline MotorData data_{};
 	static inline MotorState state_{};
 
 	static modm::Vector3f
@@ -30,6 +30,9 @@ private:
 	updateHallPort();
 
 public:
+	static void
+	initialize(const MotorData& motor);
+
 	static void
 	update(double timestep);
 
