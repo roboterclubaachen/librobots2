@@ -124,7 +124,7 @@ MotorSimulation::nextState(const std::array<float, 3>& pwms,
 	const auto t_e = (emf_factor * state_.i) * data_.k_e;
 
 	// Friction torque
-	const auto t_f = ((state_.omega_m < 0.001f) ? data_.f_s : data_.f_l) * state_.omega_m;
+	const auto t_f = ((std::abs(state_.omega_m) < 0.001f) ? data_.f_s : data_.f_l) * state_.omega_m;
 
 	// Mechanical torque
 	const auto t_m = t_e - state_.t_l - t_f;
@@ -137,7 +137,7 @@ MotorSimulation::nextState(const std::array<float, 3>& pwms,
 
 	// Come to a complete stop if we are very slow
 	if (isFrictionOnly &&
-		(std::signbit(omega_m) != std::signbit(state_.omega_m) || omega_m < 0.00001f))
+		(std::signbit(omega_m) != std::signbit(state_.omega_m) || std::abs(omega_m) < 0.00001f))
 	{
 		d_omega_m = -state_.omega_m / timestep;
 		omega_m = 0.0f;
