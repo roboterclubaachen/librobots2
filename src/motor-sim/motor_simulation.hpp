@@ -12,13 +12,17 @@ private:
 	static inline MotorData data_{};
 	static inline MotorState state_{};
 
+	static std::array<PhaseConfig, 3>
+	applyCurrentlimit(double currentLimit, const std::array<PhaseConfig, 3> inConfig,
+					  const modm::Vector3f& current);
+
 	static modm::Vector3f
 	computeVoltages(double v, const std::array<float, 3>& pwms,
 					const std::array<PhaseConfig, 3>& config, const modm::Vector3f& bemf);
 
 	static MotorState
 	nextState(const std::array<float, 3>& pwms, const std::array<PhaseConfig, 3>& config,
-			  double timestep);
+			  double timestep, double currentLimit);
 
 	static double
 	angleMod(double angle);

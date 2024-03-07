@@ -3,6 +3,8 @@
 #include <modm/debug/logger.hpp>
 #include <cmath>
 
+#include "current_limit.hpp"
+
 namespace librobots2::motor_sim
 {
 
@@ -13,6 +15,23 @@ MotorSimulation::initialize(const MotorData& motor)
 	state_ = {};
 }
 
+std::array<PhaseConfig, 3>
+MotorSimulation::applyCurrentlimit(double currentLimit, const std::array<PhaseConfig, 3> inConfig,
+								   const modm::Vector3f& current)
+{
+	std::array<PhaseConfig, 3> out = inConfig;
+	if (currentLimit >= 0.0)
+	{
+		for (size_t i = 0; i < inConfig.size(); i++)
+		{
+			if ((inConfig[i] == PhaseConfig::High || inConfig[i] == PhaseConfig::Pwm))
+			{
+				if (current[i] > currentLimit) { out[i] = PhaseConfig::Low; }
+			}
+		}
+	}
+	return out;
+}
 double
 MotorSimulation::angleMod(double angle)
 {
@@ -105,7 +124,8 @@ MotorSimulation::computeVoltages(double v, const std::array<float, 3>& pwms,
 
 MotorState
 MotorSimulation::nextState(const std::array<float, 3>& pwms,
-						   const std::array<PhaseConfig, 3>& config, double timestep)
+						   const std::array<PhaseConfig, 3>& rawConfig, double timestep,
+						   double currentLimit)
 {
 	// Trapezoidal function
 	const auto emf_factor = emfFunction(state_.theta_e);
@@ -113,8 +133,10 @@ MotorSimulation::nextState(const std::array<float, 3>& pwms,
 	// Actual back emf voltages
 	const auto e = emf_factor * data_.k_e * state_.omega_m;
 
+	const auto realConfig = applyCurrentlimit(currentLimit, rawConfig, state_.i);
+
 	// Phase voltages
-	const auto v = computeVoltages(data_.vdc, pwms, config, e);
+	const auto v = computeVoltages(data_.vdc, pwms, realConfig, e);
 
 	// Phase Currents
 	const auto d_i = (v - data_.r_s * state_.i - e) / (data_.l - data_.m);
@@ -163,7 +185,8 @@ MotorSimulation::nextState(const std::array<float, 3>& pwms,
 void
 MotorSimulation::update(double timestep)
 {
-	state_ = nextState(MotorBridge::getPWMs(), MotorBridge::getConfig(), timestep);
+	state_ =
+		nextState(MotorBridge::getPWMs(), MotorBridge::getConfig(), timestep, CurrentLimit::get());
 	updateHallPort();
 }
 
