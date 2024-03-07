@@ -14,41 +14,46 @@ using StateMachine = modm_canopen::cia402::StateMachine;
 using ControlWord = modm_canopen::cia402::CommandWord;
 using Factors = modm_canopen::cia402::Factors;
 
-struct MotorState {
-  OperatingMode mode_{OperatingMode::Disabled};
-  StateMachine status_{modm_canopen::cia402::State::SwitchOnDisabled};
-  ControlWord control_{0};
-  Factors scalingFactors_{};
+using namespace std::literals;
 
-  modm::filter::MovingAverage<uint32_t, 32> updateTime_us_{};
-  modm::chrono::micro_clock::time_point lastUpdate_{};
+constexpr modm::Clock::duration controlTiming_{1ms};
+struct MotorState
+{
+	OperatingMode mode_{OperatingMode::Disabled};
+	StateMachine status_{modm_canopen::cia402::State::SwitchOnDisabled};
+	ControlWord control_{0};
+	Factors scalingFactors_{};
 
-  int32_t actualPosition_{};
-  int32_t lastPosition_{};
+	modm::filter::MovingAverage<uint32_t, 32> updateTime_us_{};
+	modm::chrono::micro_clock::time_point lastUpdate_{};
 
-  float orientedCurrent_{};
-  float unorientedCurrent_{};
-  float orientedCurrentAngleDiff_{};
-  float maxCurrent_{3.0f};
+	int32_t actualPosition_{};
+	int32_t lastPosition_{};
 
-  static constexpr uint16_t zeroAverageCountdownReset_{256};
-  uint16_t zeroAverageCountdown_{zeroAverageCountdownReset_};
-  modm::filter::MovingAverage<float, 16> zeroAverage_{};
+	float orientedCurrent_{};
+	float unorientedCurrent_{};
+	float orientedCurrentAngleDiff_{};
+	float maxCurrent_{3.0f};
 
-  float maxCharge_{400.0f};
-  modm::BoundedDeque<std::pair<float, float>, 256> currentValues_{};
-  float currentCharge_{0.0f};
+	static constexpr uint16_t zeroAverageCountdownReset_{256};
+	uint16_t zeroAverageCountdown_{zeroAverageCountdownReset_};
+	modm::filter::MovingAverage<float, 16> zeroAverage_{};
 
-  // TODO calculcate with difference in time between pulses!
-  modm::filter::MovingAverage<int32_t, 512> actualVelocity_{};
+	float maxCharge_{400.0f};
+	modm::BoundedDeque<std::pair<float, float>, 256> currentValues_{};
+	float currentCharge_{0.0f};
 
-  bool enableMotor_{true};
-  bool resetMotor_{false};
+	// TODO calculcate with difference in time between pulses!
+	modm::filter::MovingAverage<int32_t, 512> actualVelocity_{};
 
-  modm::Clock::time_point lastExecute_;
-  modm::Clock::duration lastExecutionTime_;
+	bool enableMotor_{true};
+	bool resetMotor_{false};
 
-  int16_t outputPWM_{};
+	modm::Clock::time_point lastExecute_;
+	modm::Clock::duration lastExecutionTime_;
 
-  float getCharge() const;
+	int16_t outputPWM_{};
+
+	float
+	getCharge() const;
 };
