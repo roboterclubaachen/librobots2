@@ -9,4 +9,5 @@ struct CurrentObjects {
                                                                0}; // Custom
 
   static constexpr modm_canopen::Address DefaultPWM{0x2010, 0};  // Custom
+  static constexpr modm_canopen::Address ShouldInvert{0x2021, 0};  // Custom
 };

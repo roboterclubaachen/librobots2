@@ -61,4 +61,11 @@ CurrentProtocol<id>::registerHandlers(modm_canopen::HandlerMap<ObjectDictionary>
 
 	map.template setReadHandler<CurrentObjects::DefaultPWM>(
 		+[]() { return CurrentControl<id>::maxPWM_; });
+
+	map.template setWriteHandler<CurrentObjects::ShouldInvert>(+[](uint8_t value) {
+		CurrentControl<id>::inverting_ = (value != 0);
+		return SdoErrorCode::NoError;
+	});
+	map.template setReadHandler<CurrentObjects::ShouldInvert>(
+		+[]() { return (uint8_t)CurrentControl<id>::inverting_; });
 }
