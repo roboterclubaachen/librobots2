@@ -17,7 +17,7 @@ CurrentControl<id>::update(float inCurrent, const MotorState &state)
 	Device::setValueChanged(CurrentObjects::FilteredActualCurrent);
 
 	commandedCurrent_ = std::abs(inCurrent);
-	const float sign = inCurrent * (inverting_ ? -1.0 : 1.0);
+	const float sign = inCurrent * (inverting_ ? -1.0f : 1.0f);
 
 	// Do charge limiting
   if (std::abs(state.currentCharge_) > state.maxCharge_)
@@ -45,7 +45,7 @@ CurrentControl<id>::update(float inCurrent, const MotorState &state)
   currentError_ = commandedCurrent_ - filteredActualCurrent_;
   Device::setValueChanged(CurrentObjects::CurrentError);
 
-  if (commandedCurrent_ == 0.0f) return {0, 0.0};
+  if (commandedCurrent_ == 0.0f) return {0, 0.0f};
 
   return {std::copysign(maxPWM_, sign), commandedCurrent_};
 }
