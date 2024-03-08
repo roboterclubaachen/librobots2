@@ -8,9 +8,5 @@ struct CurrentObjects {
   static constexpr modm_canopen::Address FilteredActualCurrent{0x2018,
                                                                0}; // Custom
 
-  static constexpr modm_canopen::Address CurrentPID_kP{0x2010, 1}; // Custom
-  static constexpr modm_canopen::Address CurrentPID_kI{0x2010, 2}; // Custom
-  static constexpr modm_canopen::Address CurrentPID_kD{0x2010, 3}; // Custom
-  static constexpr modm_canopen::Address CurrentPID_MaxErrorSum{0x2010,
-                                                                4}; // Custom
+  static constexpr modm_canopen::Address DefaultPWM{0x2010, 0};  // Custom
 };

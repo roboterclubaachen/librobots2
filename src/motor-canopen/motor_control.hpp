@@ -50,6 +50,12 @@ public:
 
   static inline int16_t outputPWM() { return state_.outputPWM_; }
 
+  static inline float
+  currentLimit()
+  {
+	  return state_.outputCurrentLimit_;
+  }
+
   static inline float maxCurrent() { return state_.maxCurrent_; }
 
   template <typename ObjectDictionary>

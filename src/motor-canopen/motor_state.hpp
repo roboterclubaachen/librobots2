@@ -53,6 +53,7 @@ struct MotorState
 	modm::Clock::duration lastExecutionTime_;
 
 	int16_t outputPWM_{};
+	float outputCurrentLimit_{};
 
 	float
 	getCharge() const;
