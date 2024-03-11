@@ -2,7 +2,6 @@
 #define PWM_PROTOCOL_HPP
 #include <cstdint>
 
-#include "motor_state.hpp"
 #include <modm-canopen/cia402/operating_mode.hpp>
 #include <modm-canopen/cia402/states.hpp>
 #include <modm-canopen/device/canopen_device.hpp>

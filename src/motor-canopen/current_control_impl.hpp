@@ -4,6 +4,10 @@
 #include <algorithm>
 #include <cmath>
 #include <tuple>
+#include <modm-canopen/cia402/operating_mode.hpp>
+#include <modm-canopen/cia402/states.hpp>
+
+using modm_canopen::cia402::OperatingMode;
 
 template<size_t id>
 template<typename Device, typename State>

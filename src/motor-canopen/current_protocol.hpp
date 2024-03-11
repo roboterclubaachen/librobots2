@@ -7,7 +7,6 @@
 #include <modm-canopen/object_dictionary.hpp>
 
 #include "current_control.hpp"
-#include "motor_state.hpp"
 
 template <size_t id> class CurrentProtocol {
 public:

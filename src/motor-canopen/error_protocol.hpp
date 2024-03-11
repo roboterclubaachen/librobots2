@@ -1,8 +1,6 @@
 #ifndef ERROR_PROTOCOL_HPP
 #define ERROR_PROTOCOL_HPP
 
-#include "motor_state.hpp"
-
 #include <modm-canopen/device/canopen_device.hpp>
 #include <modm-canopen/object_dictionary.hpp>
 #include <modm/math/filter/moving_average.hpp>

@@ -3,7 +3,6 @@
 #include <cstdint>
 #include <limits>
 
-#include "motor_state.hpp"
 #include "velocity_control.hpp"
 #include <modm-canopen/device/canopen_device.hpp>
 #include <modm-canopen/object_dictionary.hpp>

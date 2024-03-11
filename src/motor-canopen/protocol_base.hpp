@@ -3,10 +3,8 @@
 #include <cstdint>
 #include <limits>
 
-#include "motor_state.hpp"
 #include <modm-canopen/device/canopen_device.hpp>
 #include <modm-canopen/object_dictionary.hpp>
-using Pid = modm::Pid<float>;
 
 template <size_t id> class ProtocolBase {
 

@@ -9,6 +9,7 @@
 #include <modm/math/filter/moving_average.hpp>
 
 #include "state_objects.hpp"
+#include "identity.hpp"
 
 using OperatingMode = modm_canopen::cia402::OperatingMode;
 using StateMachine = modm_canopen::cia402::StateMachine;
@@ -23,6 +24,11 @@ constexpr modm::Clock::duration controlTiming_{1ms};
 template<size_t id>
 struct MotorState
 {
+	static inline Identity identity_{
+		.deviceType_ = DeviceType::BLDC,
+		.productCode_ = ProductCode::MicroMotor
+	};
+
 	static inline OperatingMode mode_{OperatingMode::Disabled};
 	static inline StateMachine status_{modm_canopen::cia402::State::SwitchOnDisabled};
 	static inline ControlWord control_{0};
@@ -47,7 +53,6 @@ struct MotorState
 	static inline modm::BoundedDeque<std::pair<float, float>, 256> currentValues_{};
 	static inline float currentCharge_{0.0f};
 
-	// TODO calculcate with difference in time between pulses!
 	static inline modm::filter::MovingAverage<int32_t, 512> actualVelocity_{};
 
 	static inline bool enableMotor_{true};

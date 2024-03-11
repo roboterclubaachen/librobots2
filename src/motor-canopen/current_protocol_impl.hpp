@@ -1,6 +1,9 @@
 #ifndef CURRENT_PROTOCOL_HPP
 #error "Do not include this file directly, use current_protocol86.hpp instead"
 #endif
+#include <modm-canopen/cia402/command_bits.hpp>
+#include <modm-canopen/cia402/status_bits.hpp>
+#include <modm-canopen/cia402/operating_mode.hpp>
 
 using CommandBits = modm_canopen::cia402::CommandBits;
 using StatusBits = modm_canopen::cia402::StatusBits;

@@ -1,7 +1,6 @@
 #ifndef CURRENT_CONTROL_HPP
 #define CURRENT_CONTROL_HPP
 #include "current_objects.hpp"
-#include "motor_state.hpp"
 #include <cstdlib>
 #include <modm/container/deque.hpp>
 #include <modm/math/filter/moving_average.hpp>

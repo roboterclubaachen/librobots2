@@ -1,9 +1,8 @@
 #ifndef POSITION_PROTOCOL_HPP
 #error "Do not include this file directly, use position_protocol.hpp instead"
 #endif
-#include "motor_state.hpp"
 #include "velocity_protocol.hpp"
-#include <modm/debug/logger.hpp>
+#include "state_objects.hpp"
 
 template<size_t id>
 template<typename State>
@@ -40,11 +39,9 @@ PositionProtocol<id>::update(MessageCallback &&)
 		if (State::control_. template isSet<CommandBits::IsRelative>())
 		{
 			commandedPosition_ += nextPosition_;
-			// MODM_LOG_INFO << "Updated Target Position relative!" << modm::endl;
 		} else if (commandedPosition_ != nextPosition_)
 		{
 			commandedPosition_ = nextPosition_;
-			// MODM_LOG_INFO << "Updated Target Position absolute!" << modm::endl;
 		}
 		Device::setValueChanged(PositionObjects::PositionDemandValue);
 		VelocityControl<id>::reset();
