@@ -1,11 +1,9 @@
 #ifndef PROTOCOL_BASE_HPP
 #define PROTOCOL_BASE_HPP
-#include <cstdint>
-#include <limits>
+#include <modm/architecture/interface/can_message.hpp>
+#include <modm-canopen/handler_map.hpp>
 
-#include <modm-canopen/device/canopen_device.hpp>
-#include <modm-canopen/object_dictionary.hpp>
-
+#error "Do not use this file directly, without modifying it first!"
 template <size_t id> class ProtocolBase {
 
 public:
