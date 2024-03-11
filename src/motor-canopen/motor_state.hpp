@@ -1,4 +1,5 @@
-#pragma once
+#ifndef MOTOR_STATE_HPP
+#define MOTOR_STATE_HPP
 #include <modm-canopen/cia402/factors.hpp>
 #include <modm-canopen/cia402/operating_mode.hpp>
 #include <modm-canopen/cia402/state_machine.hpp>
@@ -11,50 +12,85 @@
 
 using OperatingMode = modm_canopen::cia402::OperatingMode;
 using StateMachine = modm_canopen::cia402::StateMachine;
+using StatusBits = modm_canopen::cia402::StatusBits;
 using ControlWord = modm_canopen::cia402::CommandWord;
 using Factors = modm_canopen::cia402::Factors;
 
 using namespace std::literals;
 
 constexpr modm::Clock::duration controlTiming_{1ms};
+
+template<size_t id>
 struct MotorState
 {
-	OperatingMode mode_{OperatingMode::Disabled};
-	StateMachine status_{modm_canopen::cia402::State::SwitchOnDisabled};
-	ControlWord control_{0};
-	Factors scalingFactors_{};
+	static inline OperatingMode mode_{OperatingMode::Disabled};
+	static inline StateMachine status_{modm_canopen::cia402::State::SwitchOnDisabled};
+	static inline ControlWord control_{0};
+	static inline Factors scalingFactors_{};
 
-	modm::filter::MovingAverage<uint32_t, 32> updateTime_us_{};
-	modm::chrono::micro_clock::time_point lastUpdate_{};
+	static inline modm::filter::MovingAverage<uint32_t, 32> updateTime_us_{};
+	static inline modm::chrono::micro_clock::time_point lastUpdate_{};
 
-	int32_t actualPosition_{};
-	int32_t lastPosition_{};
+	static inline int32_t actualPosition_{};
+	static inline int32_t lastPosition_{};
 
-	float orientedCurrent_{};
-	float unorientedCurrent_{};
-	float orientedCurrentAngleDiff_{};
-	float maxCurrent_{3.0f};
+	static inline float orientedCurrent_{};
+	static inline float unorientedCurrent_{};
+	static inline float orientedCurrentAngleDiff_{};
+	static inline float maxCurrent_{3.0f};
 
 	static constexpr uint16_t zeroAverageCountdownReset_{256};
-	uint16_t zeroAverageCountdown_{zeroAverageCountdownReset_};
-	modm::filter::MovingAverage<float, 16> zeroAverage_{};
+	static inline uint16_t zeroAverageCountdown_{zeroAverageCountdownReset_};
+	static inline modm::filter::MovingAverage<float, 16> zeroAverage_{};
 
-	float maxCharge_{400.0f};
-	modm::BoundedDeque<std::pair<float, float>, 256> currentValues_{};
-	float currentCharge_{0.0f};
+	static inline float maxCharge_{400.0f};
+	static inline modm::BoundedDeque<std::pair<float, float>, 256> currentValues_{};
+	static inline float currentCharge_{0.0f};
 
 	// TODO calculcate with difference in time between pulses!
-	modm::filter::MovingAverage<int32_t, 512> actualVelocity_{};
+	static inline modm::filter::MovingAverage<int32_t, 512> actualVelocity_{};
 
-	bool enableMotor_{true};
-	bool resetMotor_{false};
+	static inline bool enableMotor_{true};
+	static inline bool resetMotor_{false};
 
-	modm::Clock::time_point lastExecute_;
-	modm::Clock::duration lastExecutionTime_;
+	static inline modm::Clock::time_point lastExecute_;
+	static inline modm::Clock::duration lastExecutionTime_;
 
-	int16_t outputPWM_{};
-	float outputCurrentLimit_{};
+	static inline int16_t outputPWM_{};
+	static inline float outputCurrentLimit_{};
 
-	float
-	getCharge() const;
+	static inline float
+	getCharge();
+
+	static inline void
+	setActualPosition(int32_t position);
+
+	static inline void
+	setOrientedCurrent(float current);
+
+	static inline void
+	setOrientedCurrentAngleDiff(float angle);
+
+	static inline void
+	setUnorientedCurrent(float current);
+
+	static inline int16_t
+	outputPWM();
+
+	static inline float
+	currentLimit();
+
+	static inline float
+	maxCurrent();
+
+	template<typename Device, typename MessageCallback>
+	static bool
+	update(MessageCallback &&cb);
+
+	template<typename ObjectDictionary>
+	static constexpr void
+	registerHandlers(modm_canopen::HandlerMap<ObjectDictionary> &map);
 };
+
+#include "motor_state_impl.hpp"
+#endif

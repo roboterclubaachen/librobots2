@@ -10,10 +10,8 @@
 #include "quickstop_protocol.hpp"
 #include "velocity_protocol.hpp"
 
-template <size_t id, typename... Modes> class MotorControl {
+template <size_t id, typename State, typename... Modes> class MotorControl {
 private:
-  static inline MotorState state_{};
-
   template <typename Device, typename MessageCallback, typename First,
             typename Second, typename... Rest>
   static bool updateMode(MessageCallback &&cb);
@@ -22,41 +20,12 @@ private:
   static bool updateMode(MessageCallback &&cb);
 
 public:
-  static inline const MotorState &state() { return state_; }
-
   template <typename Device, typename MessageCallback>
   static bool update(MessageCallback &&cb);
 
   template <typename Device, typename MessageCallback>
   static void processMessage(const modm::can::Message &message,
                              MessageCallback &&cb);
-
-  static inline void setActualPosition(int32_t position) {
-    state_.actualPosition_ = position;
-  }
-
-  static inline void setOrientedCurrent(float current) {
-    state_.orientedCurrent_ = current;
-  }
-
-  static inline void setOrientedCurrentAngleDiff(float angle) {
-    state_.orientedCurrentAngleDiff_ = angle;
-  }
-
-  static inline void setUnorientedCurrent(float current) {
-
-    state_.unorientedCurrent_ = current;
-  }
-
-  static inline int16_t outputPWM() { return state_.outputPWM_; }
-
-  static inline float
-  currentLimit()
-  {
-	  return state_.outputCurrentLimit_;
-  }
-
-  static inline float maxCurrent() { return state_.maxCurrent_; }
 
   template <typename ObjectDictionary>
   constexpr void

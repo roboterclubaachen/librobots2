@@ -23,17 +23,18 @@ public:
   static inline modm::Clock::time_point lastMasterHeartbeat{};
 
 public:
-  static bool applicable(const MotorState &) { return true; }
+  template <typename State>
+  static bool applicable() { return true; }
 
-  template <typename Device, typename MessageCallback>
-  static bool update(MotorState &state, MessageCallback &&cb);
+  template <typename Device, typename State, typename MessageCallback>
+  static bool update(MessageCallback &&cb);
 
-  template <typename ObjectDictionary, const MotorState &state>
+  template <typename ObjectDictionary, typename State>
   static constexpr void
   registerHandlers(modm_canopen::HandlerMap<ObjectDictionary> &map);
 
-  template <typename Device, typename MessageCallback>
-  static void processMessage(MotorState &, const modm::can::Message &,
+  template <typename Device, typename State, typename MessageCallback>
+  static void processMessage(const modm::can::Message &,
                              MessageCallback &&);
 
 private:

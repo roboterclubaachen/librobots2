@@ -20,16 +20,17 @@ public:
 	static inline int32_t commandedVel_{0};
 	static inline int32_t velocityError_{};
 
-	template<typename Device>
+	template<typename Device, typename State>
 	static inline std::tuple<int16_t, float>
-	doVelocityUpdate(int32_t commandedVelocity, const MotorState &state);
+	doVelocityUpdate(int32_t commandedVelocity);
 
-	template<typename Device>
+	template<typename Device, typename State>
 	static inline std::tuple<int16_t, float>
-	doDecelerationUpdate(int32_t commandedDeceleration, const MotorState &state);
+	doDecelerationUpdate(int32_t commandedDeceleration);
 
+	template<typename State>
 	static inline void
-	resetIfApplicable(const MotorState &state);
+	resetIfApplicable();
 
 	static inline void
 	reset();

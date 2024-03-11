@@ -3,52 +3,53 @@
 #endif
 
 template<size_t id>
-template<typename Device>
+template<typename Device, typename State>
 std::tuple<int16_t, float>
-VelocityControl<id>::doVelocityUpdate(int32_t inVelocity, const MotorState &state)
+VelocityControl<id>::doVelocityUpdate(int32_t inVelocity)
 {
 
 	commandedVel_ = inVelocity;
-	if (std::signbit(commandedVel_) != std::signbit(state.actualVelocity_.getValue()) &&
-		(state.actualVelocity_.getValue() != 0 && commandedVel_ != 0))
+	if (std::signbit(commandedVel_) != std::signbit(State::actualVelocity_.getValue()) &&
+		(State::actualVelocity_.getValue() != 0 && commandedVel_ != 0))
 	{
 		reset();
 	}
-	if ((std::signbit(commandedVel_) == std::signbit(state.actualVelocity_.getValue())) ||
-		(state.actualVelocity_.getValue() == 0 && commandedVel_ != 0))
+	if ((std::signbit(commandedVel_) == std::signbit(State::actualVelocity_.getValue())) ||
+		(State::actualVelocity_.getValue() == 0 && commandedVel_ != 0))
 	{
-		isLimiting_ = state.outputPWM_ > profileAcceleration_ || CurrentControl<id>::isLimiting_;
-		velocityError_ = commandedVel_ - state.actualVelocity_.getValue();
+		isLimiting_ = State::outputPWM_ > profileAcceleration_ || CurrentControl<id>::isLimiting_;
+		velocityError_ = commandedVel_ - State::actualVelocity_.getValue();
 		velocityPid_.update(velocityError_, isLimiting_);
 		Device::setValueChanged(VelocityObjects::VelocityError);
-		return CurrentControl<id>::template update<Device>(velocityPid_.getValue(), state);
+		return CurrentControl<id>::template update<Device,State>(velocityPid_.getValue());
 	}
 	return {0, 0.0};
 }
 
 template<size_t id>
-template<typename Device>
+template<typename Device, typename State>
 std::tuple<int16_t, float>
-VelocityControl<id>::doDecelerationUpdate(int32_t commandedDeceleration, const MotorState &state)
+VelocityControl<id>::doDecelerationUpdate(int32_t commandedDeceleration)
 {
 	commandedVel_ = 0;
-	velocityError_ = -state.actualVelocity_.getValue();
-	isLimiting_ = state.outputPWM_ > commandedDeceleration || CurrentControl<id>::isLimiting_;
+	velocityError_ = -State::actualVelocity_.getValue();
+	isLimiting_ = State::outputPWM_ > commandedDeceleration || CurrentControl<id>::isLimiting_;
 	velocityPid_.update(velocityError_, isLimiting_);
 	Device::setValueChanged(VelocityObjects::VelocityError);
 	auto [pwm, currentLimit] =
-		CurrentControl<id>::template update<Device>(velocityPid_.getValue(), state);
+		CurrentControl<id>::template update<Device,State>(velocityPid_.getValue());
 	return {(int16_t)std::clamp((int32_t)pwm, -commandedDeceleration, commandedDeceleration),
 			currentLimit};
 }
 
 template<size_t id>
+template<typename State>
 void
-VelocityControl<id>::resetIfApplicable(const MotorState &state)
+VelocityControl<id>::resetIfApplicable()
 {
-	if (!state.enableMotor_ ||
-		state.status_.state() != modm_canopen::cia402::State::OperationEnabled ||
-		state.mode_ == OperatingMode::Disabled || state.mode_ == OperatingMode::Voltage)
+	if (!State::enableMotor_ ||
+		State::status_.state() != modm_canopen::cia402::State::OperationEnabled ||
+		State::mode_ == OperatingMode::Disabled || State::mode_ == OperatingMode::Voltage)
 	{
 		reset();
 	}

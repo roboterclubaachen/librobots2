@@ -5,7 +5,7 @@
 #include <modm/debug/logger.hpp>
 
 template <size_t id>
-template <typename ObjectDictionary, const MotorState &state>
+template <typename ObjectDictionary, typename State>
 constexpr void IdentityProtocol<id>::registerHandlers(
     modm_canopen::HandlerMap<ObjectDictionary> &map) {
   map.template setReadHandler<IdentityObjects::DeviceType>(

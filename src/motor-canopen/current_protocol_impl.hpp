@@ -7,35 +7,35 @@ using StatusBits = modm_canopen::cia402::StatusBits;
 using OperatingMode = modm_canopen::cia402::OperatingMode;
 
 template<size_t id>
-template<typename Device, typename MessageCallback>
+template<typename Device, typename State, typename MessageCallback>
 bool
-CurrentProtocol<id>::update(MotorState &state, MessageCallback &&)
+CurrentProtocol<id>::update(MessageCallback &&)
 {
 
 	const auto [pwm, currentLimit] =
-		CurrentControl<id>::template update<Device>(targetCurrent_, state);
-	state.outputPWM_ = pwm;
-	state.outputCurrentLimit_ = currentLimit;
+		CurrentControl<id>::template update<Device,State>(targetCurrent_);
+	State::outputPWM_ = pwm;
+	State::outputCurrentLimit_ = currentLimit;
 	return true;
 }
 
 template<size_t id>
-template<typename ObjectDictionary, const MotorState &state>
+template<typename ObjectDictionary, typename State>
 constexpr void
 CurrentProtocol<id>::registerHandlers(modm_canopen::HandlerMap<ObjectDictionary> &map)
 {
 
 	using modm_canopen::SdoErrorCode;
 	map.template setReadHandler<CurrentObjects::CommandedCurrent>(+[]() {
-		if (state.mode_ != OperatingMode::Current && state.mode_ != OperatingMode::Velocity &&
-			state.mode_ != OperatingMode::Position)
+		if (State::mode_ != OperatingMode::Current && State::mode_ != OperatingMode::Velocity &&
+			State::mode_ != OperatingMode::Position)
 			return 0.0f;
 		return CurrentControl<id>::commandedCurrent_;
 	});
 
 	map.template setReadHandler<CurrentObjects::FilteredActualCurrent>(+[]() {
-		if (state.mode_ != OperatingMode::Current && state.mode_ != OperatingMode::Velocity &&
-			state.mode_ != OperatingMode::Position)
+		if (State::mode_ != OperatingMode::Current && State::mode_ != OperatingMode::Velocity &&
+			State::mode_ != OperatingMode::Position)
 			return 0.0f;
 		return CurrentControl<id>::filteredActualCurrent_;
 	});
@@ -48,8 +48,8 @@ CurrentProtocol<id>::registerHandlers(modm_canopen::HandlerMap<ObjectDictionary>
 	});
 
 	map.template setReadHandler<CurrentObjects::CurrentError>(+[]() {
-		if (state.mode_ != OperatingMode::Current && state.mode_ != OperatingMode::Velocity &&
-			state.mode_ != OperatingMode::Position)
+		if (State::mode_ != OperatingMode::Current && State::mode_ != OperatingMode::Velocity &&
+			State::mode_ != OperatingMode::Position)
 			return 0.0f;
 		return CurrentControl<id>::currentError_;
 	});

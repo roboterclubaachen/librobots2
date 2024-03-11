@@ -11,17 +11,18 @@ using Pid = modm::Pid<float>;
 template <size_t id> class ProtocolBase {
 
 public:
-  static bool applicable(const MotorState &state);
+  template <typename State>
+  static bool applicable();
 
-  template <typename Device, typename MessageCallback>
-  static bool update(MotorState &state, MessageCallback &&cb);
+  template <typename Device, typename State, typename MessageCallback>
+  static bool update(MessageCallback &&cb);
 
-  template <typename ObjectDictionary, const MotorState &state>
+  template <typename ObjectDictionary, typename State>
   static constexpr void
   registerHandlers(modm_canopen::HandlerMap<ObjectDictionary> &map);
 
-  template <typename Device, typename MessageCallback>
-  static void processMessage(MotorState &, const modm::can::Message &,
-                             MessageCallback &&) {}
+  template <typename Device, typename State, typename MessageCallback>
+  static void processMessage(const modm::can::Message &,
+                             MessageCallback &&);
 };
 #endif

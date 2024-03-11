@@ -15,8 +15,8 @@ void HeartbeatProtocol<id>::makeHeartbeatMSG(uint8_t canId,
 }
 
 template <size_t id>
-template <typename Device, typename MessageCallback>
-bool HeartbeatProtocol<id>::update(MotorState &state, MessageCallback &&cb) {
+template <typename Device, typename State, typename MessageCallback>
+bool HeartbeatProtocol<id>::update(MessageCallback &&cb) {
   if (heartBeatTimer_.execute()) {
     modm::can::Message message;
     makeHeartbeatMSG(Device::nodeId(), message);
@@ -27,14 +27,14 @@ bool HeartbeatProtocol<id>::update(MotorState &state, MessageCallback &&cb) {
       now - lastMasterHeartbeat > masterHeartbeatTimeout) {
     MODM_LOG_WARNING << "Master heartbeat timed out!" << modm::endl;
 
-    state.mode_ = OperatingMode::Disabled;
+    State::mode_ = OperatingMode::Disabled;
     // TODO implement this in statemachine
-    auto stateWord_ = state.status_.status();
+    auto stateWord_ = State::status_.status();
     constexpr uint16_t disableVoltageMask_ = 0b0100'1111;
     constexpr uint16_t disableVoltageValue_ = 0b0100'0000;
     stateWord_ = (stateWord_ & ~disableVoltageMask_) |
                  (disableVoltageValue_ & disableVoltageMask_);
-    state.status_.set(stateWord_);
+    State::status_.set(stateWord_);
     Device::setValueChanged(StateObjects::ModeOfOperation);
     Device::setValueChanged(StateObjects::StatusWord);
 
@@ -44,9 +44,8 @@ bool HeartbeatProtocol<id>::update(MotorState &state, MessageCallback &&cb) {
 }
 
 template <size_t id>
-template <typename Device, typename MessageCallback>
-void HeartbeatProtocol<id>::processMessage(MotorState &,
-                                           const modm::can::Message &msg,
+template <typename Device, typename State,  typename MessageCallback>
+void HeartbeatProtocol<id>::processMessage(const modm::can::Message &msg,
                                            MessageCallback &&) {
   if (msg.getIdentifier() != 0x700 + masterID)
     return;
@@ -62,7 +61,7 @@ void HeartbeatProtocol<id>::processMessage(MotorState &,
 }
 
 template <size_t id>
-template <typename ObjectDictionary, const MotorState &state>
+template <typename ObjectDictionary, typename State>
 constexpr void HeartbeatProtocol<id>::registerHandlers(
     modm_canopen::HandlerMap<ObjectDictionary> &map) {
   using modm_canopen::SdoErrorCode;

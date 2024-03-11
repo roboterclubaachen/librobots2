@@ -15,21 +15,22 @@ public:
   static inline int16_t commandedPWM_{0};
 
 public:
-  static bool applicable(const MotorState &state) {
-    return state.mode_ == OperatingMode::Voltage &&
-           state.status_.state() ==
+template <typename State>
+  static bool applicable() {
+    return State::mode_ == OperatingMode::Voltage &&
+           State::status_.state() ==
                modm_canopen::cia402::State::OperationEnabled;
   }
 
-  template <typename Device, typename MessageCallback>
-  static bool update(MotorState &state, MessageCallback &&cb);
+  template <typename Device, typename State, typename MessageCallback>
+  static bool update(MessageCallback &&cb);
 
-  template <typename ObjectDictionary, const MotorState &state>
+  template <typename ObjectDictionary, typename State>
   static constexpr void
   registerHandlers(modm_canopen::HandlerMap<ObjectDictionary> &map);
 
-  template <typename Device, typename MessageCallback>
-  static void processMessage(MotorState &, const modm::can::Message &,
+  template <typename Device, typename State, typename MessageCallback>
+  static void processMessage(const modm::can::Message &,
                              MessageCallback &&) {}
 };
 

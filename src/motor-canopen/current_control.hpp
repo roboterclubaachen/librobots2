@@ -21,12 +21,13 @@ public:
 	static inline float filteredActualCurrent_{0.0f};
 	static inline int16_t maxPWM_{1 << 14};
 
-	template<typename Device>
+	template<typename Device,typename State>
 	static std::tuple<int16_t, float>
-	update(float commandedCurrent, const MotorState &state);
+	update(float commandedCurrent);
 
+	template<typename State>
 	static void
-	resetIfApplicable(const MotorState &state);
+	resetIfApplicable();
 	static void
 	reset();
 };

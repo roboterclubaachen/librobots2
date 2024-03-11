@@ -11,34 +11,34 @@ using StatusBits = modm_canopen::cia402::StatusBits;
 using OperatingMode = modm_canopen::cia402::OperatingMode;
 
 template<size_t id>
-template<typename Device, typename MessageCallback>
+template<typename Device, typename State, typename MessageCallback>
 bool
-VelocityProtocol<id>::update(MotorState &state, MessageCallback &&)
+VelocityProtocol<id>::update(MessageCallback &&)
 {
 
-	if (state.mode_ == OperatingMode::Velocity ||
-		state.control_.isSet<CommandBits::ChangeImmediately>() ||
+	if (State::mode_ == OperatingMode::Velocity ||
+		State::control_. template isSet<CommandBits::ChangeImmediately>() ||
 		VelocityControl<id>::velocityError_ == 0)
 	{
 		commandedVelocity_ = receivedVelocity_;
 	}
 
-	if (state.control_.isSet<CommandBits::Halt>()) { commandedVelocity_ = 0; }
+	if (State::control_. template isSet<CommandBits::Halt>()) { commandedVelocity_ = 0; }
 
 	if (commandedVelocity_ == 0)
 	{
-		state.outputPWM_ = 0;
-		state.outputCurrentLimit_ = 0.0;
+		State::outputPWM_ = 0;
+		State::outputCurrentLimit_ = 0.0;
 	} else
 	{
 		const auto [pwm, currentLimit] =
-			VelocityControl<id>::template doVelocityUpdate<Device>(commandedVelocity_, state);
-		state.outputPWM_ = pwm;
-		state.outputCurrentLimit_ = currentLimit;
+			VelocityControl<id>::template doVelocityUpdate<Device,State>(commandedVelocity_);
+		State::outputPWM_ = pwm;
+		State::outputCurrentLimit_ = currentLimit;
 	}
 
-	state.status_.setBit<StatusBits::TargetReached>(VelocityControl<id>::velocityError_ == 0);
-	state.status_.setBit<StatusBits::SpeedZero>(state.actualVelocity_.getValue() ==
+	State::status_. template setBit<StatusBits::TargetReached>(VelocityControl<id>::velocityError_ == 0);
+	State::status_. template setBit<StatusBits::SpeedZero>(State::actualVelocity_.getValue() ==
 												0);  // TODO implement velocity Threshold (for zero
 													 // and no speed indication)
 	// TODO implement max slippage
@@ -48,28 +48,28 @@ VelocityProtocol<id>::update(MotorState &state, MessageCallback &&)
 }
 
 template<size_t id>
-template<typename ObjectDictionary, const MotorState &state>
+template<typename ObjectDictionary, typename State>
 constexpr void
 VelocityProtocol<id>::registerHandlers(modm_canopen::HandlerMap<ObjectDictionary> &map)
 {
 	using modm_canopen::SdoErrorCode;
 	map.template setReadHandler<VelocityObjects::VelocityDemandValue>(+[]() {
-		if (state.mode_ != OperatingMode::Velocity && state.mode_ != OperatingMode::Position)
+		if (State::mode_ != OperatingMode::Velocity && State::mode_ != OperatingMode::Position)
 			return (int32_t)0;
-		return state.scalingFactors_.velocity.toUser(VelocityControl<id>::commandedVel_);
+		return State::scalingFactors_.velocity.toUser(VelocityControl<id>::commandedVel_);
 	});
 
 	map.template setReadHandler<VelocityObjects::VelocityError>(+[]() {
-		if (state.mode_ != OperatingMode::Velocity && state.mode_ != OperatingMode::Position)
+		if (State::mode_ != OperatingMode::Velocity && State::mode_ != OperatingMode::Position)
 			return (int32_t)0;
-		return state.scalingFactors_.velocity.toUser(VelocityControl<id>::velocityError_);
+		return State::scalingFactors_.velocity.toUser(VelocityControl<id>::velocityError_);
 	});
 
 	map.template setReadHandler<VelocityObjects::TargetVelocity>(
-		+[]() { return state.scalingFactors_.velocity.toUser(receivedVelocity_); });
+		+[]() { return State::scalingFactors_.velocity.toUser(receivedVelocity_); });
 
 	map.template setWriteHandler<VelocityObjects::TargetVelocity>(+[](int32_t value) {
-		receivedVelocity_ = state.scalingFactors_.velocity.toInternal(value);
+		receivedVelocity_ = State::scalingFactors_.velocity.toInternal(value);
 		// MODM_LOG_INFO << "Set Target Velocity to " << receivedVelocity_
 		//               << modm::endl;
 		return SdoErrorCode::NoError;
@@ -100,12 +100,12 @@ VelocityProtocol<id>::registerHandlers(modm_canopen::HandlerMap<ObjectDictionary
 	});
 
 	map.template setReadHandler<VelocityObjects::ProfileAcceleration>(+[]() {
-		return state.scalingFactors_.acceleration.toUser(VelocityControl<id>::profileAcceleration_);
+		return State::scalingFactors_.acceleration.toUser(VelocityControl<id>::profileAcceleration_);
 	});
 
 	map.template setWriteHandler<VelocityObjects::ProfileAcceleration>(+[](int32_t value) {
 		VelocityControl<id>::profileAcceleration_ =
-			state.scalingFactors_.acceleration.toInternal(value);
+			State::scalingFactors_.acceleration.toInternal(value);
 		return SdoErrorCode::NoError;
 	});
 }
