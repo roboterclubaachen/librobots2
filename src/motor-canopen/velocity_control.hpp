@@ -2,6 +2,7 @@
 #define VELOCITY_CONTROL_HPP
 #include "current_control.hpp"
 #include <cstdlib>
+#include <tuple>
 #include <modm/math/filter/pid.hpp>
 #include "velocity_objects.hpp"
 

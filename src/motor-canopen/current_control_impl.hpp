@@ -3,6 +3,7 @@
 #endif
 #include <algorithm>
 #include <cmath>
+#include <tuple>
 
 template<size_t id>
 template<typename Device, typename State>
