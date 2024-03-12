@@ -16,9 +16,9 @@ public:
 	static inline float currentError_{};
 	static inline float commandedCurrent_{};
 	static inline bool isLimiting_{false};
-	static inline bool inverting_{false};
+	static inline bool inverting_{true};
 	static inline float filteredActualCurrent_{0.0f};
-	static inline int16_t maxPWM_{1 << 14};
+	static inline int16_t maxPWM_{(1 << 15)-1};
 
 	template<typename Device,typename State>
 	static std::tuple<int16_t, float>

@@ -47,12 +47,22 @@ CurrentControl<id>::update(float inCurrent)
   }
   Device::setValueChanged(CurrentObjects::CommandedCurrent);
 
+  const float ramp = std::clamp(commandedCurrent_/State::maxCurrent_,0.1f,1.0f);
+
+
   currentError_ = commandedCurrent_ - filteredActualCurrent_;
   Device::setValueChanged(CurrentObjects::CurrentError);
 
   if (commandedCurrent_ == 0.0f) return {0, 0.0f};
 
-  return {std::copysign(maxPWM_, sign), commandedCurrent_};
+  commandedCurrent_ += 0.5f;
+  if (commandedCurrent_ > std::abs(State::maxCurrent_))
+  {
+	  commandedCurrent_ = std::clamp(commandedCurrent_, 0.0f, State::maxCurrent_);
+	  isLimiting_ = true;
+  }
+
+  return {std::copysign(maxPWM_ * ramp, sign), commandedCurrent_};
 }
 
 template<size_t id>
