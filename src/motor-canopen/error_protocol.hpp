@@ -11,12 +11,9 @@ template<size_t id>
 class ErrorProtocol
 {
 private:
-	static inline int16_t lastPWM_{};
-	static inline modm::filter::MovingAverage<int16_t, 16> pwmChange_;
-	static inline uint32_t errorCounter_ = 0;
-	static constexpr uint32_t maxErrorTime_ = 512;
+	static inline modm::chrono::micro_clock::duration errorCounter_ = 0ms;
+	static constexpr modm::chrono::micro_clock::duration maxErrorTime_ = 512ms;
 	static constexpr int32_t stallVelocity_ = 10;
-	static constexpr int16_t pwmWindow_ = 5;
 
 public:
 	template<typename State>

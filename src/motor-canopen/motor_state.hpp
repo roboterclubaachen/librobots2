@@ -24,10 +24,8 @@ constexpr modm::Clock::duration controlTiming_{1ms};
 template<size_t id>
 struct MotorState
 {
-	static inline Identity identity_{
-		.deviceType_ = DeviceType::BLDC,
-		.productCode_ = ProductCode::MicroMotor
-	};
+	static inline Identity identity_{.deviceType_ = DeviceType::BLDC,
+									 .productCode_ = ProductCode::MicroMotor};
 
 	static inline OperatingMode mode_{OperatingMode::Disabled};
 	static inline StateMachine status_{modm_canopen::cia402::State::SwitchOnDisabled};
@@ -35,6 +33,7 @@ struct MotorState
 	static inline Factors scalingFactors_{};
 
 	static inline modm::filter::MovingAverage<uint32_t, 32> updateTime_us_{};
+	static inline modm::chrono::micro_clock::duration lastUpdateTime_{};
 	static inline modm::chrono::micro_clock::time_point lastUpdate_{};
 
 	static inline int32_t actualPosition_{};
@@ -57,9 +56,6 @@ struct MotorState
 
 	static inline bool enableMotor_{true};
 	static inline bool resetMotor_{false};
-
-	static inline modm::Clock::time_point lastExecute_;
-	static inline modm::Clock::duration lastExecutionTime_;
 
 	static inline int16_t outputPWM_{};
 	static inline float outputCurrentLimit_{};

@@ -67,7 +67,8 @@ bool
 MotorState<id>::update(MessageCallback &&)
 {
 	const auto now = modm::chrono::micro_clock::now();
-	const auto lastUpdateTime_us = (now - lastUpdate_).count();
+	lastUpdateTime_ = now - lastUpdate_;
+	const auto lastUpdateTime_us = lastUpdateTime_.count();
 	const auto lastUpdateTime_s = (float)lastUpdateTime_us / 1000000.0f;
 	updateTime_us_.update(lastUpdateTime_us);
 	lastUpdate_ = now;
@@ -92,8 +93,8 @@ MotorState<id>::update(MessageCallback &&)
 	currentCharge_ = getCharge();
 	Device::setValueChanged(StateObjects::CurrentCharge);
 
-	const auto newVelocity_ =
-		(float)(actualPosition_ - lastPosition_) * 1000.0f * 1000.0f / (float)lastUpdateTime_us;
+	const auto newVelocity_ = (float)(actualPosition_ - lastPosition_) * (1 << 12) * 1000.0f *
+							  1000.0f / (float)lastUpdateTime_us;
 	lastPosition_ = actualPosition_;
 	actualVelocity_.update(
 		(int32_t)newVelocity_);  // Increase velocity resolution for better regulation
@@ -139,8 +140,7 @@ MotorState<id>::registerHandlers(modm_canopen::HandlerMap<ObjectDictionary> &map
 	map.template setReadHandler<StateObjects::UpdateTime>(
 		+[]() { return uint32_t(updateTime_us_.getValue()); });
 
-	map.template setReadHandler<StateObjects::ModeOfOperation>(
-		+[]() { return int8_t(mode_); });
+	map.template setReadHandler<StateObjects::ModeOfOperation>(+[]() { return int8_t(mode_); });
 
 	map.template setReadHandler<StateObjects::ModeOfOperationDisplay>(
 		+[]() { return int8_t(mode_); });
@@ -159,8 +159,7 @@ MotorState<id>::registerHandlers(modm_canopen::HandlerMap<ObjectDictionary> &map
 			{
 				mode_ = newMode;
 				MODM_LOG_INFO << "Set operating mode to "
-							  << modm_canopen::cia402::operatingModeToString(mode_)
-							  << modm::endl;
+							  << modm_canopen::cia402::operatingModeToString(mode_) << modm::endl;
 			}
 			return SdoErrorCode::NoError;
 		} else
@@ -169,8 +168,7 @@ MotorState<id>::registerHandlers(modm_canopen::HandlerMap<ObjectDictionary> &map
 		}
 	});
 
-	map.template setReadHandler<StateObjects::ControlWord>(
-		+[]() { return control_.value(); });
+	map.template setReadHandler<StateObjects::ControlWord>(+[]() { return control_.value(); });
 
 	map.template setWriteHandler<StateObjects::ControlWord>(+[](uint16_t value) {
 		control_.update(value);
@@ -178,8 +176,7 @@ MotorState<id>::registerHandlers(modm_canopen::HandlerMap<ObjectDictionary> &map
 		return SdoErrorCode::NoError;
 	});
 
-	map.template setReadHandler<StateObjects::StatusWord>(
-		+[]() { return status_.status(); });
+	map.template setReadHandler<StateObjects::StatusWord>(+[]() { return status_.status(); });
 
 	map.template setReadHandler<StateObjects::PositionActualValue>(
 		+[]() { return scalingFactors_.position.toUser(actualPosition_); });
@@ -187,9 +184,8 @@ MotorState<id>::registerHandlers(modm_canopen::HandlerMap<ObjectDictionary> &map
 	map.template setReadHandler<StateObjects::PositionInternalValue>(
 		+[]() { return actualPosition_; });
 
-	map.template setReadHandler<StateObjects::VelocityActualValue>(+[]() {
-		return scalingFactors_.velocity.toUser(actualVelocity_.getValue());
-	});
+	map.template setReadHandler<StateObjects::VelocityActualValue>(
+		+[]() { return scalingFactors_.velocity.toUser(actualVelocity_.getValue()); });
 
 	map.template setReadHandler<StateObjects::OutputPWM>(+[]() { return outputPWM_; });
 
@@ -265,12 +261,10 @@ MotorState<id>::registerHandlers(modm_canopen::HandlerMap<ObjectDictionary> &map
 		return SdoErrorCode::NoError;
 	});
 
-	map.template setReadHandler<StateObjects::OrientedCurrent>(
-		+[]() { return orientedCurrent_; });
+	map.template setReadHandler<StateObjects::OrientedCurrent>(+[]() { return orientedCurrent_; });
 
 	map.template setReadHandler<StateObjects::OrientedCurrentAngleDiff>(
 		+[]() { return orientedCurrentAngleDiff_; });
 
-	map.template setReadHandler<StateObjects::CurrentCharge>(
-		+[]() { return currentCharge_; });
+	map.template setReadHandler<StateObjects::CurrentCharge>(+[]() { return currentCharge_; });
 }
