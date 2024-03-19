@@ -43,7 +43,7 @@ struct MotorState
 	static inline float orientedCurrent_{};
 	static inline float unorientedCurrent_{};
 	static inline float orientedCurrentAngleDiff_{};
-	static inline float maxCurrent_{3.0f};
+	static inline float maxCurrent_{6.0f};
 
 	static constexpr uint16_t zeroAverageCountdownReset_{256};
 	static inline uint16_t zeroAverageCountdown_{zeroAverageCountdownReset_};

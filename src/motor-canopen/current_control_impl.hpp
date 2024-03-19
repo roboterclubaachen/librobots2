@@ -47,7 +47,7 @@ CurrentControl<id>::update(float inCurrent)
   }
   Device::setValueChanged(CurrentObjects::CommandedCurrent);
 
-  const float ramp = std::clamp(commandedCurrent_/State::maxCurrent_,0.1f,1.0f);
+  const float ramp = std::clamp(commandedCurrent_/State::maxCurrent_,0.0f,1.0f);
 
 
   currentError_ = commandedCurrent_ - filteredActualCurrent_;
