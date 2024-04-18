@@ -3,15 +3,6 @@
 #endif
 
 template<size_t id>
-inline float
-MotorState<id>::getCharge()
-{
-	float acc = 0.0f;
-	for (auto &pair : currentValues_) { acc += pair.first * pair.second; }
-	return acc;
-}
-
-template<size_t id>
 inline void
 MotorState<id>::setActualPosition(int32_t position)
 {
@@ -89,8 +80,9 @@ MotorState<id>::update(MessageCallback &&)
 	}
 
 	// Calculate remaining charge
-	currentValues_.appendOverwrite({std::abs(unorientedCurrent_), lastUpdateTime_s});
-	currentCharge_ = getCharge();
+	currentCharge_ += std::abs(unorientedCurrent_)* lastUpdateTime_s;
+	currentCharge_ -= std::abs(dischargeRate_)*lastUpdateTime_s;
+	if(currentCharge_ < 0.0f) currentCharge_ = 0.0f;
 	Device::setValueChanged(StateObjects::CurrentCharge);
 
 	const auto newVelocity_ = lastUpdateTime_us != 0 ? (float)(actualPosition_ - lastPosition_) * 1000.0f *

@@ -48,8 +48,8 @@ struct MotorState
 	static inline uint16_t zeroAverageCountdown_{zeroAverageCountdownReset_};
 	static inline modm::filter::MovingAverage<float, 16> zeroAverage_{};
 
-	static inline float maxCharge_{400.0f};
-	static inline modm::BoundedDeque<std::pair<float, float>, 256> currentValues_{};
+	static inline float maxCharge_{10.0f};
+	static inline float dischargeRate_{1.0f};
 	static inline float currentCharge_{0.0f};
 
 	static inline modm::filter::MovingAverage<int32_t, 512> actualVelocity_{};
@@ -60,8 +60,6 @@ struct MotorState
 	static inline int16_t outputPWM_{};
 	static inline float outputCurrentLimit_{};
 
-	static inline float
-	getCharge();
 
 	static inline void
 	setActualPosition(int32_t position);
