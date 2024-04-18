@@ -12,7 +12,7 @@ template<size_t id>
 class VelocityControl
 {
 public:
-	static inline Pid::Parameter velocityPidParameters_{1.0f, 0.0f, 0.0f, 10000.0f,
+	static inline Pid::Parameter velocityPidParameters_{1.0f, 0.0f, 0.0f, 1000000.0f,
 														std::numeric_limits<int16_t>::max()};
 	static inline Pid velocityPid_;
 	static inline int32_t profileAcceleration_{5000};
