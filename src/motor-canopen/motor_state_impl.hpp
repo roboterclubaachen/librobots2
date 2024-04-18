@@ -93,8 +93,8 @@ MotorState<id>::update(MessageCallback &&)
 	currentCharge_ = getCharge();
 	Device::setValueChanged(StateObjects::CurrentCharge);
 
-	const auto newVelocity_ = (float)(actualPosition_ - lastPosition_) * (1 << 12) * 1000.0f *
-							  1000.0f / (float)lastUpdateTime_us;
+	const auto newVelocity_ = lastUpdateTime_us != 0 ? (float)(actualPosition_ - lastPosition_) * 1000.0f *
+							  1000.0f / (float)lastUpdateTime_us : 0.0f ;
 	lastPosition_ = actualPosition_;
 	actualVelocity_.update(
 		(int32_t)newVelocity_);  // Increase velocity resolution for better regulation
