@@ -17,30 +17,24 @@ VelocityProtocol<id>::update(MessageCallback &&)
 {
 
 	if (State::mode_ == OperatingMode::Velocity ||
-		State::control_. template isSet<CommandBits::ChangeImmediately>() ||
+		State::control_.template isSet<CommandBits::ChangeImmediately>() ||
 		VelocityControl<id>::velocityError_ == 0)
 	{
 		commandedVelocity_ = receivedVelocity_;
 	}
 
-	if (State::control_. template isSet<CommandBits::Halt>()) { commandedVelocity_ = 0; }
+	if (State::control_.template isSet<CommandBits::Halt>()) { commandedVelocity_ = 0; }
 
-	if (commandedVelocity_ == 0)
-	{
-		State::outputPWM_ = 0;
-		State::outputCurrentLimit_ = 0.0;
-	} else
-	{
-		const auto [pwm, currentLimit] =
-			VelocityControl<id>::template doVelocityUpdate<Device,State>(commandedVelocity_);
-		State::outputPWM_ = pwm;
-		State::outputCurrentLimit_ = currentLimit;
-	}
+	const auto [pwm, currentLimit] =
+		VelocityControl<id>::template doVelocityUpdate<Device, State>(commandedVelocity_);
+	State::outputPWM_ = pwm;
+	State::outputCurrentLimit_ = currentLimit;
 
-	State::status_. template setBit<StatusBits::TargetReached>(VelocityControl<id>::velocityError_ == 0);
-	State::status_. template setBit<StatusBits::SpeedZero>(State::actualVelocity_.getValue() ==
-												0);  // TODO implement velocity Threshold (for zero
-													 // and no speed indication)
+	State::status_.template setBit<StatusBits::TargetReached>(VelocityControl<id>::velocityError_ ==
+															  0);
+	State::status_.template setBit<StatusBits::SpeedZero>(State::actualVelocity_.getValue() ==
+														  0);  // TODO implement velocity Threshold
+															   // (for zero and no speed indication)
 	// TODO implement max slippage
 	Device::setValueChanged(VelocityObjects::VelocityDemandValue);
 	Device::setValueChanged(VelocityObjects::VelocityError);
@@ -100,7 +94,8 @@ VelocityProtocol<id>::registerHandlers(modm_canopen::HandlerMap<ObjectDictionary
 	});
 
 	map.template setReadHandler<VelocityObjects::ProfileAcceleration>(+[]() {
-		return State::scalingFactors_.acceleration.toUser(VelocityControl<id>::profileAcceleration_);
+		return State::scalingFactors_.acceleration.toUser(
+			VelocityControl<id>::profileAcceleration_);
 	});
 
 	map.template setWriteHandler<VelocityObjects::ProfileAcceleration>(+[](int32_t value) {

@@ -8,11 +8,19 @@ std::tuple<int16_t, float>
 VelocityControl<id>::doVelocityUpdate(int32_t inVelocity)
 {
 
+	const bool JustNowZero = commandedVel_ != 0 && inVelocity == 0;
 	commandedVel_ = inVelocity;
-	if (std::signbit(commandedVel_) != std::signbit(State::actualVelocity_.getValue()) &&
-		(State::actualVelocity_.getValue() != 0 && commandedVel_ != 0))
+	//const bool braking =
+	//	(std::signbit(commandedVel_) != std::signbit(State::actualVelocity_.getValue())) ||
+		//(commandedVel_ == 0 && State::actualVelocity_.getValue());
+	if ((std::signbit(commandedVel_) != std::signbit(State::actualVelocity_.getValue()) &&
+		(State::actualVelocity_.getValue() != 0 && commandedVel_ != 0)) || JustNowZero)
 	{
 		reset();
+	}
+	if ( std::abs(State::actualVelocity_.getValue()) <= 10 && commandedVel_ == 0){
+		reset();
+		return {0,0};
 	}
 	isLimiting_ = CurrentControl<id>::isLimiting_;
 	velocityError_ = commandedVel_ - State::actualVelocity_.getValue();

@@ -52,7 +52,7 @@ struct MotorState
 	static inline float dischargeRate_{1.0f};
 	static inline float currentCharge_{0.0f};
 
-	static inline modm::filter::MovingAverage<int32_t, 512> actualVelocity_{};
+	static inline modm::filter::MovingAverage<int32_t, 64> actualVelocity_{};
 
 	static inline bool enableMotor_{true};
 	static inline bool resetMotor_{false};
