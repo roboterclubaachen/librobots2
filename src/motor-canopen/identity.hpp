@@ -11,7 +11,7 @@ enum class ProductCode : uint32_t
 {
 	MicroMotor = 0,
 	Can2x = 1,
-
+	AlphaMotor = 2,
 };
 
 struct Identity
