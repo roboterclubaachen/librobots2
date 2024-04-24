@@ -10,6 +10,7 @@
 
 #include "state_objects.hpp"
 #include "identity.hpp"
+#include "motor_info.hpp"
 
 using OperatingMode = modm_canopen::cia402::OperatingMode;
 using StateMachine = modm_canopen::cia402::StateMachine;
@@ -26,6 +27,7 @@ struct MotorState
 {
 	static inline Identity identity_{.deviceType_ = DeviceType::BLDC,
 									 .productCode_ = ProductCode::MicroMotor};
+	static inline float winding_r_ohm_{1.8f};
 
 	static inline OperatingMode mode_{OperatingMode::Disabled};
 	static inline StateMachine status_{modm_canopen::cia402::State::SwitchOnDisabled};
@@ -60,6 +62,11 @@ struct MotorState
 	static inline int16_t outputPWM_{};
 	static inline float outputCurrentLimit_{};
 
+
+	static inline void initialize(const MotorInfo& info){
+		winding_r_ohm_ = info.winding_r_ohm;
+		identity_ = info.id;
+	}
 
 	static inline void
 	setActualPosition(int32_t position);
