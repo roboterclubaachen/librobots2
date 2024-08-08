@@ -3,6 +3,7 @@
 #endif
 #include "velocity_protocol.hpp"
 #include "state_objects.hpp"
+#include <modm/debug/logger.hpp>
 
 template<size_t id>
 template<typename State>
@@ -26,6 +27,7 @@ PositionProtocol<id>::update(MessageCallback &&)
 {
 	if (State::control_. template isSet<CommandBits::NewSetPoint>())
 	{
+		MODM_LOG_DEBUG << "Set next Target position to " << receivedPosition_ << modm::endl;
 		nextPosition_ = receivedPosition_;
 		nextPositionIsNew_ = true;
 		State::control_. template setBit<CommandBits::NewSetPoint>(false);
@@ -43,6 +45,7 @@ PositionProtocol<id>::update(MessageCallback &&)
 		{
 			commandedPosition_ = nextPosition_;
 		}
+		MODM_LOG_DEBUG << "Set current Target position to " << receivedPosition_ << modm::endl;
 		Device::setValueChanged(PositionObjects::PositionDemandValue);
 		VelocityControl<id>::reset();
 	}
@@ -94,6 +97,7 @@ PositionProtocol<id>::registerHandlers(modm_canopen::HandlerMap<ObjectDictionary
 
 	map.template setWriteHandler<PositionObjects::TargetPosition>(+[](int32_t value) {
 		receivedPosition_ = State::scalingFactors_.position.toInternal(value);
+		MODM_LOG_DEBUG << "Set received Target Position to " << receivedPosition_ << modm::endl;
 		return SdoErrorCode::NoError;
 	});
 

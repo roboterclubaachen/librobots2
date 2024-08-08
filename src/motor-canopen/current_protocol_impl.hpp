@@ -4,6 +4,7 @@
 #include <modm-canopen/cia402/command_bits.hpp>
 #include <modm-canopen/cia402/status_bits.hpp>
 #include <modm-canopen/cia402/operating_mode.hpp>
+#include <modm/debug/logger.hpp>
 
 using CommandBits = modm_canopen::cia402::CommandBits;
 using StatusBits = modm_canopen::cia402::StatusBits;
@@ -46,6 +47,7 @@ CurrentProtocol<id>::registerHandlers(modm_canopen::HandlerMap<ObjectDictionary>
 	map.template setReadHandler<CurrentObjects::TargetCurrent>(+[]() { return targetCurrent_; });
 
 	map.template setWriteHandler<CurrentObjects::TargetCurrent>(+[](float value) {
+		MODM_LOG_DEBUG << "Set Target Current to " << value << modm::endl;
 		targetCurrent_ = value;
 		return SdoErrorCode::NoError;
 	});

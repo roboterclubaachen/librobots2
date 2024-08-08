@@ -64,8 +64,7 @@ VelocityProtocol<id>::registerHandlers(modm_canopen::HandlerMap<ObjectDictionary
 
 	map.template setWriteHandler<VelocityObjects::TargetVelocity>(+[](int32_t value) {
 		receivedVelocity_ = State::scalingFactors_.velocity.toInternal(value);
-		// MODM_LOG_INFO << "Set Target Velocity to " << receivedVelocity_
-		//               << modm::endl;
+		MODM_LOG_INFO << "Set Target Velocity to " << receivedVelocity_ << modm::endl;
 		return SdoErrorCode::NoError;
 	});
 
