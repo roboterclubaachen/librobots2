@@ -25,27 +25,29 @@ template<typename Device, typename State, typename MessageCallback>
 bool
 PositionProtocol<id>::update(MessageCallback &&)
 {
-	if (State::control_. template isSet<CommandBits::NewSetPoint>())
+	if (State::control_.template isSet<CommandBits::NewSetPoint>())
 	{
 		MODM_LOG_DEBUG << "Set next Target position to " << receivedPosition_ << modm::endl;
 		nextPosition_ = receivedPosition_;
 		nextPositionIsNew_ = true;
-		State::control_. template setBit<CommandBits::NewSetPoint>(false);
+		State::control_.template setBit<CommandBits::NewSetPoint>(false);
 		Device::setValueChanged(StateObjects::ControlWord);
 	}
 
 	if ((positionError_ == 0 && nextPositionIsNew_) ||
-		State::control_. template isSet<CommandBits::ChangeImmediately>())
+		State::control_.template isSet<CommandBits::ChangeImmediately>())
 	{
 		nextPositionIsNew_ = false;
-		if (State::control_. template isSet<CommandBits::IsRelative>())
+		if (State::control_.template isSet<CommandBits::IsRelative>())
 		{
 			commandedPosition_ += nextPosition_;
+			MODM_LOG_DEBUG << "Set current Target position to " << commandedPosition_ << " (rel)"
+						   << modm::endl;
 		} else if (commandedPosition_ != nextPosition_)
 		{
 			commandedPosition_ = nextPosition_;
+			MODM_LOG_DEBUG << "Set current Target position to " << commandedPosition_ << modm::endl;
 		}
-		MODM_LOG_DEBUG << "Set current Target position to " << receivedPosition_ << modm::endl;
 		Device::setValueChanged(PositionObjects::PositionDemandValue);
 		VelocityControl<id>::reset();
 	}
@@ -56,7 +58,7 @@ PositionProtocol<id>::update(MessageCallback &&)
 	positionPid_.update(positionError_, std::abs(positionPid_.getValue()) > 6000 ||
 											VelocityControl<id>::isLimiting_);
 	const auto [pwm, currentLimit] =
-		VelocityControl<id>::template doVelocityUpdate<Device,State>(positionPid_.getValue());
+		VelocityControl<id>::template doVelocityUpdate<Device, State>(positionPid_.getValue());
 	State::outputPWM_ = pwm;
 	State::outputCurrentLimit_ = currentLimit;
 
@@ -71,7 +73,8 @@ PositionProtocol<id>::update(MessageCallback &&)
 		inPositionWindow_ = 0;
 	}
 
-	State::status_. template setBit<StatusBits::TargetReached>(inPositionWindow_ >= positionWindowTime_);
+	State::status_.template setBit<StatusBits::TargetReached>(inPositionWindow_ >=
+															  positionWindowTime_);
 	return true;
 }
 
