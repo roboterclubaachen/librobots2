@@ -2,10 +2,11 @@
 <library>
   <repositories>
     <repository><path>../../repo.lb</path></repository>
+    <repository><path>../../../modm/repo.lb</path></repository>
   </repositories>
 
   <options>
-    <option name=":target">stm32f407vgt6</option>
+    <option name="modm:target">stm32f407vgt6</option>
     <option name="modm:build:info.git">Info+Status</option>
     <option name="modm:build:info.build">True</option>
   </options>

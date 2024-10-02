@@ -1,0 +1,57 @@
+name: Compile code for target and host, run unittest on host
+on: [push, pull_request]
+
+jobs:
+  compile-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        name: Checkout modm
+        with:
+          github-server-url: https://git.roboterclub.rwth-aachen.de
+          token:  ${{ secrets.REG_PASSWORD }}
+          repository: rca/modm.git
+          submodules: recursive
+          ref: 2023q3
+          path: modm
+      - uses: actions/checkout@v4
+        name: Checkout repo
+        with:
+          path: librobots2
+          submodules: recursive
+          token: ${{ secrets.REG_PASSWORD }}
+      - uses: actions/checkout@v4
+        name: Checkout actions
+        with:
+          github-server-url: https://git.roboterclub.rwth-aachen.de
+          repository: RCA/ci-actions
+          ref: v1.2
+          token:  ${{ secrets.REG_PASSWORD }}
+          path: ./.gitea/actions
+      - uses: ./.gitea/actions/run_docker
+        name: Compile tests (in docker)
+        with:
+          registry: git.roboterclub.rwth-aachen.de
+          username: ${{ secrets.REG_USERNAME }}
+          password: ${{ secrets.REG_PASSWORD }}
+          arch: linux/amd64
+          image: ghcr.io/modm-ext/modm-build-cortex-m:2023-10-10
+          shell: /bin/bash
+          run: |
+            pwd ; ls
+            ls
+            cd librobots2
+            pwd ; ls
+            cd tests/
+            ls -ahl
+            for i in */project.xml
+            do
+              echo $i
+              echo $(dirname $i)
+              pushd $(dirname $i)
+              pwd
+              ls
+              lbuild build
+              scons -j 7
+              popd
+            done
