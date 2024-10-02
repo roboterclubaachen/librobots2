@@ -6,3 +6,4 @@
 #include "velocity_objects.hpp"
 #include "position_objects.hpp"
 #include "pwm_objects.hpp"
+#include "encoder_objects.hpp"
