@@ -38,8 +38,6 @@ def build(env):
     env.copy("motor_disabled.hpp")
     env.copy("motor_interface.hpp")
     env.copy("utility/polymorphic_storage.hpp")
-
-    if not str(env.get("modm:target")) == "hosted-linux":
-        env.copy("bldc_motor_foc.hpp")
-        env.copy("bldc_motor_foc_impl.hpp")
-        env.copy("svm.hpp")
+    env.copy("bldc_motor_foc.hpp")
+    env.copy("bldc_motor_foc_impl.hpp")
+    env.copy("svm.hpp")

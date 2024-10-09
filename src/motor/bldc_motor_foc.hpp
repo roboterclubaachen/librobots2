@@ -12,7 +12,11 @@
 
 #include <cstdint>
 #include <modm/math/filter/pid.hpp>
+#ifndef MODM_OS_HOSTED
 #include <cmsis/dsp/arm_math.h>
+#else
+#include <cmath>
+#endif
 
 #include "motor_base.hpp"
 #include "motor_bridge.hpp"

@@ -51,7 +51,12 @@ template<typename MotorBridge>
 void BldcMotorFoc<MotorBridge>::update()
 {
     float sine{}, cosine{};
+    #ifndef MODM_OS_HOSTED
     arm_sin_cos_f32(motorAngle_, &sine, &cosine);
+    #else
+    sine = std::sin(motorAngle_ / 180.0f * M_PI);
+    cosine = std::cos(motorAngle_ / 180.0f * M_PI);
+    #endif
     const auto currentD =  cosine * currentAlpha_ + sine   * currentBeta_;
     const auto currentQ =  -sine  * currentAlpha_ + cosine * currentBeta_;
 
