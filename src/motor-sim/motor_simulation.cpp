@@ -13,6 +13,8 @@ MotorSimulation::initialize(const MotorData& motor)
 {
 	data_ = motor;
 	state_ = {};
+	state_.theta_m = (std::rand() % 3600)/10.0f/180.0f*M_PI;
+	state_.theta_e = angleMod(state_.theta_m * data_.p / 2);
 }
 
 std::array<PhaseConfig, 3>
