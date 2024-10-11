@@ -1,7 +1,7 @@
 #include "motor_bridge.hpp"
 
 #include <modm/debug/logger.hpp>
-
+#include <algorithm>
 namespace librobots2::motor_sim
 {
 
@@ -73,7 +73,9 @@ MotorBridge::getConfig()
 const std::array<float, 3>
 MotorBridge::getPWMs()
 {
-	return {(float)pwms[0] / MaxPwm, (float)pwms[1] / (float)MaxPwm, (float)pwms[2] / MaxPwm};
+	return {std::clamp((float)pwms[0] / MaxPwm, 0.0f, 1.0f),
+			std::clamp((float)pwms[1] / MaxPwm, 0.0f, 1.0f),
+			std::clamp((float)pwms[2] / MaxPwm, 0.0f, 1.0f)};
 }
 
 }  // namespace librobots2::motor_sim
