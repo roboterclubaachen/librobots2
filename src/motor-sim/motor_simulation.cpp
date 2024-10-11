@@ -209,6 +209,30 @@ MotorSimulation::updateHallPort()
 	Pin<2>::set(index == 3 || index == 4 || index == 5);
 }
 
+std::array<double, 3>
+MotorSimulation::getInputVoltages()
+{
+	auto pwms = MotorBridge::getPWMs();
+	auto config = MotorBridge::getConfig();
+	std::array<double, 3> rpwm = {0.0, 0.0, 0.0};
+	for (int i = 0; i < 3; i++)
+	{
+		if (config[i] == PhaseConfig::HiZ || config[i] == PhaseConfig::Low)
+		{
+			rpwm[i] = 0.0;
+		} else if (config[i] == PhaseConfig::Pwm)
+		{
+			rpwm[i] = pwms[i];
+		} else if (config[i] == PhaseConfig::High)
+		{
+			rpwm[i] = 1.0;
+		}
+	}
+	std::array<double, 3> mult = {2 * rpwm[0] - rpwm[1] - rpwm[2], 2 * rpwm[1] - rpwm[0] - rpwm[2],
+								 2 * rpwm[2] - rpwm[1] - rpwm[0]};
+	return {mult[0] * data_.vdc / 6, mult[1] * data_.vdc / 6, mult[2] * data_.vdc / 6};
+}
+
 MotorState&
 MotorSimulation::state()
 {

@@ -43,6 +43,9 @@ public:
 	static MotorState&
 	state();
 
+	static std::array<double, 3>
+	getInputVoltages();
+
 	static double
 	maxCurrent();
 };
