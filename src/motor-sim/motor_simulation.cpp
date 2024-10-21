@@ -4,6 +4,7 @@
 #include <cmath>
 
 #include "current_limit.hpp"
+#include "motor_current.hpp"
 
 namespace librobots2::motor_sim
 {
@@ -13,8 +14,9 @@ MotorSimulation::initialize(const MotorData& motor)
 {
 	data_ = motor;
 	state_ = {};
-	state_.theta_m = (std::rand() % 3600)/10.0f/180.0f*M_PI;
-	state_.theta_e = angleMod(state_.theta_m * data_.p / 2);
+	state_.theta_m = (std::rand() % 3600) / 10.0f / 180.0f * M_PI;
+	state_.theta_e_integrated = state_.theta_m * data_.p / 2;
+	state_.theta_e = angleMod(state_.theta_e_integrated);
 }
 
 std::array<PhaseConfig, 3>
@@ -169,6 +171,8 @@ MotorSimulation::nextState(const std::array<float, 3>& pwms,
 
 	const auto theta_m = angleMod(state_.theta_m + state_.omega_m * timestep);
 	const auto theta_e = angleMod(theta_m * data_.p / 2);
+	const auto theta_e_integrated =
+		state_.theta_e_integrated + state_.omega_m * timestep * data_.p / 2;
 
 	// Create new state object
 	MotorState out{};
@@ -178,6 +182,7 @@ MotorSimulation::nextState(const std::array<float, 3>& pwms,
 	out.omega_m = omega_m;
 	out.theta_m = theta_m;
 	out.theta_e = theta_e;
+	out.theta_e_integrated = theta_e_integrated;
 	out.t_e = t_e;
 	out.t_f = t_f;
 	out.t_l = state_.t_l;
@@ -190,6 +195,15 @@ MotorSimulation::update(double timestep)
 	state_ =
 		nextState(MotorBridge::getPWMs(), MotorBridge::getConfig(), timestep, CurrentLimit::get());
 	updateHallPort();
+	updateADCs();
+}
+
+void
+MotorSimulation::updateADCs()
+{
+	SimADC<0>::setValue(state_.i[0]);
+	SimADC<1>::setValue(state_.i[1]);
+	SimADC<2>::setValue(state_.i[2]);
 }
 
 double
@@ -229,7 +243,7 @@ MotorSimulation::getInputVoltages()
 		}
 	}
 	std::array<double, 3> mult = {2 * rpwm[0] - rpwm[1] - rpwm[2], 2 * rpwm[1] - rpwm[0] - rpwm[2],
-								 2 * rpwm[2] - rpwm[1] - rpwm[0]};
+								  2 * rpwm[2] - rpwm[1] - rpwm[0]};
 	return {mult[0] * data_.vdc / 6, mult[1] * data_.vdc / 6, mult[2] * data_.vdc / 6};
 }
 

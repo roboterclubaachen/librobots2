@@ -33,6 +33,9 @@ private:
 	static void
 	updateHallPort();
 
+	static void
+	updateADCs();
+
 public:
 	static void
 	initialize(const MotorData& motor);

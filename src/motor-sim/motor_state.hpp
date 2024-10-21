@@ -13,7 +13,8 @@ struct MotorState
 	double t_f{};                                       // Friction Torque
 	double t_l{0.0};                                    // Load Torque
 	double theta_m{};                                   // Mechanical angle
-	double theta_e{};
+	double theta_e{};                                   // Electrical angle
+	double theta_e_integrated{};                        // Electrical angle not wrapped
 };
 
 }  // namespace librobots2::motor_sim
