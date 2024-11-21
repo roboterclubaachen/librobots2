@@ -17,6 +17,12 @@ public:
 
 	static bool
 	hasSeenIndex();
+
+	static void
+	setOverflow(uint16_t val);
+
+private:
+	static inline uint16_t overflow_{2048};
 };
 
 }  // namespace librobots2::motor_sim

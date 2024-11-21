@@ -7,10 +7,17 @@ void
 Encoder::initialize()
 {}
 
+void
+Encoder::setOverflow(uint16_t val)
+{
+	overflow_ = val;
+}
+
 uint16_t
 Encoder::getEncoderRaw()
 {
-	return (uint16_t)std::round(MotorSimulation::state().theta_e_integrated * 2000 / (2 * M_PI));
+	return ((uint16_t)std::round(MotorSimulation::state().theta_e_integrated * overflow_ /
+								(2 * M_PI))) % overflow_;
 }
 
 bool
