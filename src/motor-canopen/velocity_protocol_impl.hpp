@@ -50,20 +50,20 @@ VelocityProtocol<id>::registerHandlers(modm_canopen::HandlerMap<ObjectDictionary
 	map.template setReadHandler<VelocityObjects::VelocityDemandValue>(+[]() {
 		if (State::mode_ != OperatingMode::Velocity && State::mode_ != OperatingMode::Position)
 			return (int32_t)0;
-		return State::scalingFactors_.velocity.toUser(VelocityControl<id>::commandedVel_);
+		return State::scalingFactors_.velocity.template toUser<int32_t>(VelocityControl<id>::commandedVel_);
 	});
 
 	map.template setReadHandler<VelocityObjects::VelocityError>(+[]() {
 		if (State::mode_ != OperatingMode::Velocity && State::mode_ != OperatingMode::Position)
 			return (int32_t)0;
-		return State::scalingFactors_.velocity.toUser(VelocityControl<id>::velocityError_);
+		return State::scalingFactors_.velocity.template toUser<int32_t>(VelocityControl<id>::velocityError_);
 	});
 
 	map.template setReadHandler<VelocityObjects::TargetVelocity>(
-		+[]() { return State::scalingFactors_.velocity.toUser(receivedVelocity_); });
+		+[]() { return State::scalingFactors_.velocity.template toUser<int32_t>(receivedVelocity_); });
 
 	map.template setWriteHandler<VelocityObjects::TargetVelocity>(+[](int32_t value) {
-		receivedVelocity_ = State::scalingFactors_.velocity.toInternal(value);
+		receivedVelocity_ = State::scalingFactors_.velocity.template toInternal<int32_t>(value);
 		MODM_LOG_INFO << "Set Target Velocity to " << receivedVelocity_ << modm::endl;
 		return SdoErrorCode::NoError;
 	});
@@ -93,13 +93,13 @@ VelocityProtocol<id>::registerHandlers(modm_canopen::HandlerMap<ObjectDictionary
 	});
 
 	map.template setReadHandler<VelocityObjects::ProfileAcceleration>(+[]() {
-		return State::scalingFactors_.acceleration.toUser(
+		return State::scalingFactors_.acceleration.template toUser<int32_t>(
 			VelocityControl<id>::profileAcceleration_);
 	});
 
 	map.template setWriteHandler<VelocityObjects::ProfileAcceleration>(+[](int32_t value) {
 		VelocityControl<id>::profileAcceleration_ =
-			State::scalingFactors_.acceleration.toInternal(value);
+			State::scalingFactors_.acceleration.template toInternal<int32_t>(value);
 		return SdoErrorCode::NoError;
 	});
 }

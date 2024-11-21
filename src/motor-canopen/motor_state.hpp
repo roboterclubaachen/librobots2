@@ -9,7 +9,6 @@
 #include <modm/math/filter/moving_average.hpp>
 
 #include "state_objects.hpp"
-#include "identity.hpp"
 #include "motor_info.hpp"
 
 using OperatingMode = modm_canopen::cia402::OperatingMode;
@@ -25,8 +24,6 @@ constexpr modm::Clock::duration controlTiming_{1ms};
 template<size_t id>
 struct MotorState
 {
-	static inline Identity identity_{.deviceType_ = DeviceType::BLDC,
-									 .productCode_ = ProductCode::MicroMotor};
 	static inline float winding_r_ohm_{1.8f};
 
 	static inline OperatingMode mode_{OperatingMode::Disabled};
@@ -65,7 +62,6 @@ struct MotorState
 
 	static inline void initialize(const MotorInfo& info){
 		winding_r_ohm_ = info.winding_r_ohm;
-		identity_ = info.id;
 	}
 
 	static inline void

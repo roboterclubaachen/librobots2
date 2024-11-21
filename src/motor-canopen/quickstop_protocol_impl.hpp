@@ -30,10 +30,10 @@ QuickstopProtocol<id>::registerHandlers(modm_canopen::HandlerMap<ObjectDictionar
 {
 	using modm_canopen::SdoErrorCode;
 	map.template setReadHandler<QuickStopObjects::QuickStopDeceleration>(
-		+[]() { return State::scalingFactors_.acceleration.toUser(quickStopDeceleration_); });
+		+[]() { return State::scalingFactors_.acceleration.template toUser<int32_t>(quickStopDeceleration_); });
 
 	map.template setWriteHandler<QuickStopObjects::QuickStopDeceleration>(+[](int32_t value) {
-		quickStopDeceleration_ = State::scalingFactors_.acceleration.toInternal(value);
+		quickStopDeceleration_ = State::scalingFactors_.acceleration.template toInternal<int32_t>(value);
 		return SdoErrorCode::NoError;
 	});
 }

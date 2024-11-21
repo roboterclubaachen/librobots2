@@ -171,13 +171,13 @@ MotorState<id>::registerHandlers(modm_canopen::HandlerMap<ObjectDictionary> &map
 	map.template setReadHandler<StateObjects::StatusWord>(+[]() { return status_.status(); });
 
 	map.template setReadHandler<StateObjects::PositionActualValue>(
-		+[]() { return scalingFactors_.position.toUser(actualPosition_); });
+		+[]() { return scalingFactors_.position.toUser<int32_t>(actualPosition_); });
 
 	map.template setReadHandler<StateObjects::PositionInternalValue>(
 		+[]() { return actualPosition_; });
 
 	map.template setReadHandler<StateObjects::VelocityActualValue>(
-		+[]() { return scalingFactors_.velocity.toUser(actualVelocity_.getValue()); });
+		+[]() { return scalingFactors_.velocity.toUser<int32_t>(actualVelocity_.getValue()); });
 
 	map.template setReadHandler<StateObjects::OutputPWM>(+[]() { return outputPWM_; });
 

@@ -87,28 +87,28 @@ PositionProtocol<id>::registerHandlers(modm_canopen::HandlerMap<ObjectDictionary
 
 	map.template setReadHandler<PositionObjects::FollowingErrorActualValue>(+[]() {
 		if (State::mode_ != OperatingMode::Position) return (int32_t)0;
-		return State::scalingFactors_.position.toUser(positionError_);
+		return State::scalingFactors_.position.template toUser<int32_t>(positionError_);
 	});
 
 	map.template setReadHandler<PositionObjects::PositionDemandValue>(+[]() {
 		if (State::mode_ != OperatingMode::Position) return (int32_t)0;
-		return State::scalingFactors_.position.toUser(commandedPosition_);
+		return State::scalingFactors_.position.template toUser<int32_t>(commandedPosition_);
 	});
 
 	map.template setReadHandler<PositionObjects::TargetPosition>(
-		+[]() { return State::scalingFactors_.position.toUser(receivedPosition_); });
+		+[]() { return State::scalingFactors_.position.template toUser<int32_t>(receivedPosition_); });
 
 	map.template setWriteHandler<PositionObjects::TargetPosition>(+[](int32_t value) {
-		receivedPosition_ = State::scalingFactors_.position.toInternal(value);
+		receivedPosition_ = State::scalingFactors_.position.template toInternal<int32_t>(value);
 		MODM_LOG_DEBUG << "Set received Target Position to " << receivedPosition_ << modm::endl;
 		return SdoErrorCode::NoError;
 	});
 
 	map.template setReadHandler<PositionObjects::PositionWindow>(
-		+[]() { return State::scalingFactors_.position.toUser(positionWindow_); });
+		+[]() { return State::scalingFactors_.position.template toUser<uint32_t>(positionWindow_); });
 
 	map.template setWriteHandler<PositionObjects::PositionWindow>(+[](uint32_t value) {
-		positionWindow_ = State::scalingFactors_.position.toInternal(value);
+		positionWindow_ = State::scalingFactors_.position.template toInternal<uint32_t>(value);
 		return SdoErrorCode::NoError;
 	});
 
