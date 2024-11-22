@@ -42,6 +42,7 @@ EncoderProtocol<id, EncoderTimer>::registerHandlers(modm_canopen::HandlerMap<Obj
 		+[]() { return lastTimestep.count(); });
 	map.template setReadHandler<EncoderObjects::EncoderDelta>(+[]() { return delta; });
 	map.template setWriteHandler<EncoderObjects::EncoderOverrun>(+[](uint16_t value) {
+		if (value == 0) return SdoErrorCode::InvalidValue;
 		EncoderTimer::setOverflow(value);
 		return SdoErrorCode::NoError;
 	});
